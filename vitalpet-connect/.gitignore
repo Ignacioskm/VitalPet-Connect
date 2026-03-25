@@ -1,0 +1,23 @@
+# Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.DS_Store
+
+# Spring Boot
+application-local.properties
+application-local.yml
+
+# Logs
+*.log
+logs/
+
+# Docker
+.env
