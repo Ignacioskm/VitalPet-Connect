@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 // User solo manejará los datos personales, la contraseña y el rol van a ir en el ms-auth.
 @Entity
+@Table(name = "users")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,7 +27,7 @@ public class User {
     private String email;
 
     @Column(name = "phone_number",nullable = false)
-    private int phoneNumber;
+    private String phoneNumber;
 
     @Column(nullable = false)
     private String address;
