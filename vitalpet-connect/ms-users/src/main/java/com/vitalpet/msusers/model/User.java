@@ -23,17 +23,17 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "phone_number",nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(nullable = false)
+    @Column
     private String address;
 
     //Hibernate crea automaticamente la fecha cuando se crea.
     @CreationTimestamp
-    @Column(name = "fecha_creacion",nullable = false)
+    @Column(name = "create_at",updatable = false)
     private LocalDateTime createdAt;
 }

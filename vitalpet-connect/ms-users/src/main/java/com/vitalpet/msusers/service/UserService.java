@@ -3,13 +3,14 @@ package com.vitalpet.msusers.service;
 import com.vitalpet.msusers.dto.UserRequestDTO;
 import com.vitalpet.msusers.model.User;
 import com.vitalpet.msusers.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class UserService {
-
+    @Autowired
     private UserRepository userRepository;
 
     //Traer usuarios
@@ -32,7 +33,7 @@ public class UserService {
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
         user.setPhoneNumber(dto.getPhoneNumber());
-        user.setAddress(dto.getAdress());
+        user.setAddress(dto.getAddress());
 
         return userRepository.save(user);
     }
@@ -44,7 +45,7 @@ public class UserService {
         existing.setFirstName(dto.getFirstName());
         existing.setLastName(dto.getLastName());
         existing.setPhoneNumber(dto.getPhoneNumber());
-        existing.setAddress(dto.getAdress());
+        existing.setAddress(dto.getAddress());
         //Considerando que en la lógica buscamos todos por email, no lo dejamos actualizar para evitar duplicados.
         return userRepository.save(existing);
     }
