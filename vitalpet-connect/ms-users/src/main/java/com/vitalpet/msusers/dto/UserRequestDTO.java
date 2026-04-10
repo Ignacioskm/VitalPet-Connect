@@ -18,5 +18,5 @@ public class UserRequestDTO {
     private String email;
 
     private String phoneNumber;
-    private String adress;
+    private String address;
 }
