@@ -32,8 +32,16 @@ public class User {
     @Column
     private String address;
 
+    @Column(nullable = false)
+    private Boolean active = true;
+
     //Hibernate crea automaticamente la fecha cuando se crea.
     @CreationTimestamp
     @Column(name = "create_at",updatable = false)
     private LocalDateTime createdAt;
+
+    //FK hacia roles
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 }
