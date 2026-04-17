@@ -33,20 +33,20 @@ public class Staff {
     @Column (name="phone_number", nullable = false)
     private String phoneNumber;
 
-    @Column (nullable = false)
-    private String speciality;
-
     private Boolean active = true;
 
     private LocalDate hireDate;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     //Referencia logica branch Martina.
     @Column (name="branch_id", nullable = false)
     private Long branchId;
 
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
     @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StaffSchedule> schedules = new ArrayList<>();
+
+    @ManyToOne
+    private Specialty specialty;
 }

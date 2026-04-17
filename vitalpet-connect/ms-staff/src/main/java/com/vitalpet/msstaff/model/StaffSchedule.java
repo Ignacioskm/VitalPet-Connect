@@ -17,10 +17,6 @@ public class StaffSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "staff_id", nullable = false)
-    private Staff staff;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DayOfWeek dayOfWeek;
@@ -30,4 +26,8 @@ public class StaffSchedule {
 
     @Column(nullable = false)
     private LocalTime endTime;
+
+    @ManyToOne
+    @JoinColumn(name = "staff_id", nullable = false)
+    private Staff staff;
 }
