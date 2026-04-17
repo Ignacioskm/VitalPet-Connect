@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface RepositoryBranches extends JpaRepository<Branches,Long> {
 
-    Optional<Branches> findbyAddress(String address);
+    Optional<Branches> findByAddress(String address);
     boolean existsByAddress(String address);
 
     List<Branches> findByActiveTrue();

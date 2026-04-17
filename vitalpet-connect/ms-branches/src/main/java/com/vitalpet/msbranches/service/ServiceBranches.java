@@ -55,10 +55,10 @@ public class ServiceBranches {
         City city = repositoryCity.findByName(dto.getCityName()).orElseThrow(() -> new RuntimeException("Ciudad no encontrada" + dto.getCityName()));
 
         Branches branches = new Branches();
-        branches.setName(branches.getName());
-        branches.setAddress(branches.getAddress());
-        branches.setPhone(branches.getPhone());
-        branches.setEmail(branches.getEmail());
+        branches.setName(dto.getName());
+        branches.setAddress(dto.getAddress());
+        branches.setPhone(dto.getPhone());
+        branches.setEmail(dto.getEmail());
         branches.setCity(city);
 
         return toDTO(repositoryBranches.save(branches));

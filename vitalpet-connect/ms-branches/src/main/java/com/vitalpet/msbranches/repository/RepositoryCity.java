@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface RepositoryCity extends JpaRepository<City,Long> {
     Optional<City> findByName(String name);
-    boolean existByName(String name);
+    boolean existsByName(String name);
 
 
 }
