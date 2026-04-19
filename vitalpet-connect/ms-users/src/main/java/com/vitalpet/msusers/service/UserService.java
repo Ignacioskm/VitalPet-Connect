@@ -96,4 +96,15 @@ public class UserService {
         user.setActive(false);
         userRepository.save(user);
     }
+
+    //Verificar si existe
+    public boolean UserExistsById(Long id){
+        return userRepository.existsById(id);
+    }
+
+
+    //Traer usuarios por rol
+    public List<UserResponseDTO> getUsersByRol(String roleName){
+        return userRepository.findByRoleName(roleName).stream().map(this::toDTO).collect(Collectors.toList());
+    }
 }

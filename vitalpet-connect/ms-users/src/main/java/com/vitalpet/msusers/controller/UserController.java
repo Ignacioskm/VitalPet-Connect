@@ -46,4 +46,16 @@ public class UserController {
         userService.deactivate(id);
         return ResponseEntity.noContent().build();
     }
+
+    //listar usuarios por rol
+    @GetMapping("/role/{roleName}")
+    public ResponseEntity<List<UserResponseDTO>> getUsersByRol(@PathVariable String roleName){
+        return ResponseEntity.ok(userService.getUsersByRol(roleName));
+    }
+
+    //Verificar si el usuario existe (Este endpoint sera consumido por otros MS)
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> userExistsById(@PathVariable Long id){
+        return ResponseEntity.ok(userService.UserExistsById(id));
+    }
 }
