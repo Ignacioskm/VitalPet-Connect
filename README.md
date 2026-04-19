@@ -54,7 +54,7 @@ Para no configurar MySQL manualmente por cada servicio, utiliza el archivo `dock
 bash
 docker-compose up -d
 
-###2. Servidor de Descubrimiento (Eureka Server)
+### **2. Servidor de Descubrimiento (Eureka Server)
 Es el componente crítico que permite que los servicios se encuentren entre sí:
 
 Navega a la carpeta del proyecto eureka-server/.
@@ -63,7 +63,7 @@ Ejecuta el comando: ./mvnw spring-boot:run (o usa tu IDE).
 
 Accede al panel de control en: http://localhost:8761.
 
-###3. Ejecución de Microservicios
+### **3. Ejecución de Microservicios
 Una vez Eureka esté "UP", levanta los servicios esenciales en este orden de dependencia lógica:
 
 ## 📋 Microservicios
@@ -83,7 +83,7 @@ Una vez Eureka esté "UP", levanta los servicios esenciales en este orden de dep
 | eureka-server | 8761 | Service Discovery | — |
 | api-gateway | 8080 | Puerta de entrada | — |
 
-##🧪 Pruebas y Validación (Postman)
+## 🧪 Pruebas y Validación (Postman)
 El sistema implementa validaciones cruzadas. Un ejemplo del flujo de trabajo es la creación de un miembro del Staff:
 
 POST a /api/branches: Crea una sucursal (ej: ID 1 en Viña del Mar).
@@ -96,7 +96,7 @@ Si la sucursal existe y está activa, el registro se guarda junto con su lista d
 
 Si la sucursal no existe, el sistema retorna un error descriptivo (400 Bad Request).
 
-##📝 Notas de Desarrollo e Infraestructura
+## 📝 Notas de Desarrollo e Infraestructura
 Persistencia: Se utiliza spring.jpa.hibernate.ddl-auto: update para mantener los datos manuales.
 
 Semilla de datos: Los archivos data.sql usan INSERT IGNORE para cargar roles, ciudades y especialidades automáticamente.
