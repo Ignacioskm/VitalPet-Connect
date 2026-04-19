@@ -1,9 +1,13 @@
 package com.vitalpet.msstaff.service;
 
+import com.vitalpet.msstaff.client.BranchClient;
+import com.vitalpet.msstaff.dto.ScheduleResponseDTO;
 import com.vitalpet.msstaff.dto.StaffRequestDTO;
 import com.vitalpet.msstaff.dto.StaffResponseDTO;
+import com.vitalpet.msstaff.dto.ScheduleRequestDTO;
 import com.vitalpet.msstaff.model.Specialty;
 import com.vitalpet.msstaff.model.Staff;
+import com.vitalpet.msstaff.model.StaffSchedule;
 import com.vitalpet.msstaff.repository.StaffRepository;
 import com.vitalpet.msstaff.repository.StaffScheduleRepository;
 import com.vitalpet.msstaff.repository.StaffSpecialty;
@@ -24,6 +28,10 @@ public class StaffService {
     @Autowired
     private StaffSpecialty staffSpecialty;
 
+    // Este es el cliente del feign
+    @Autowired
+    private BranchClient branchClient;
+
 
     //Convertir staff a DTO
 
@@ -39,10 +47,38 @@ public class StaffService {
         dto.setHireDate(staff.getHireDate());
         dto.setCreatedAt(staff.getCreatedAt());
         dto.setBranchId(staff.getBranchId());
-        dto.setSchedules(staff.getSchedules());
+        //En vez de pasar los horarios directos mapeamos el DTO de salida
+        if (staff.getSchedules() != null) {
+            List<ScheduleResponseDTO> scheduleDTOs = staff.getSchedules().stream()
+                    .map(this::toScheduleDTO) //
+                    .collect(Collectors.toList());
+            dto.setSchedules(scheduleDTOs);
+        }
         dto.setSpecialtyName(staff.getSpecialty().getName());
         return dto;
     }
+
+    // Metodo auxiliar para los horarios
+    //Le pasamos el dto y el staff para pasarlo a entidad y vincular el horario con el staff en la BD
+    private StaffSchedule toEntitySchedule(ScheduleRequestDTO sDto, Staff staff){
+        StaffSchedule staffSchedule = new StaffSchedule();
+        staffSchedule.setDayOfWeek(sDto.getDayOfWeek());
+        staffSchedule.setStartTime(sDto.getStartTime());
+        staffSchedule.setEndTime(sDto.getEndTime());
+        staffSchedule.setStaff(staff); // <- Aca se vincula el horario con el staff en la BD
+        return staffSchedule;
+    }
+
+    //Metodo auxiliar para convertira la entidad de la BD -> en un DTO response
+    private ScheduleResponseDTO toScheduleDTO(StaffSchedule entity) {
+        ScheduleResponseDTO sDto = new ScheduleResponseDTO();
+        sDto.setId(entity.getId());
+        sDto.setDayOfWeek(entity.getDayOfWeek());
+        sDto.setStartTime(entity.getStartTime());
+        sDto.setEndTime(entity.getEndTime());
+        return sDto;
+    }
+
 
     //Traer todos los staff y mapearlos a StaffResponseDTO
     public List<StaffResponseDTO> getAll(){
@@ -56,6 +92,15 @@ public class StaffService {
     }
 
     public StaffResponseDTO create(StaffRequestDTO dto){
+        // Primero validamos al otro microservicio antes de buscar nada más.
+        //Con esto nos aseguramos que el id de la sucursal exista y si no mató nomas.
+        Boolean branchExists = branchClient.existsById(dto.getBranchId());
+
+        //Aca ocupamos el metodo de Boolean para verificar ver si branchExist es False
+        if(Boolean.FALSE.equals(branchExists)){
+            throw new RuntimeException("Error: La sucursal con ID" + dto.getBranchId() + "no existe");
+        }
+
         if(staffRepository.existsByEmail(dto.getEmail())){
             throw new RuntimeException("El email ya esta registrado");
         }
@@ -68,11 +113,27 @@ public class StaffService {
         staff.setEmail(dto.getEmail());
         staff.setPhoneNumber(dto.getPhoneNumber());
         staff.setHireDate(dto.getHireDate());
-
-        //Aca traer el id del branch con el nombre! implementar método en branches
-        //staff.setBranchId();
-
+        staff.setBranchId(dto.getBranchId());
         staff.setSpecialty(specialty);
+
+        //Aca verificamos que los horarios estén en el JSON del cliente
+        if(dto.getSchedules() != null){
+
+            //Aquí parece redundante a java no le gusta que las variables que se trabajan en un stream
+            //cambien tanto, arriba le seteamos parametros, entonces creamos un objeto "Final"
+            Staff finalStaff = staff;
+
+            List<StaffSchedule> scheduleEntities = dto.getSchedules()
+                    .stream() //<- Aca abrimos la cinta transportadora
+                    //Aca llamamos al metodo para cada sDTO pasandole el horario y su dueño
+                    .map(sDto -> toEntitySchedule(sDto,finalStaff))
+                    //Aca metemos denuevo los objetos ya convertidos en una lista
+                    .collect(Collectors.toList());
+
+            //Aca entregamos la lista de entidades al objeto Staff
+            staff.setSchedules(scheduleEntities);
+        }
+
 
         return toDTO(staffRepository.save(staff));
     }

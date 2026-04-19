@@ -16,6 +16,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true # Espera a que se creen las tablas
+  sql:
+    init:
+      mode: always # Ejecuta data.sql siempre
 
 eureka:
   client:

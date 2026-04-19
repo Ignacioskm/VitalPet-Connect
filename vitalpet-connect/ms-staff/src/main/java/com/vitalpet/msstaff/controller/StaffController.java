@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/staff")
 public class StaffController {
 
     @Autowired
@@ -32,12 +32,12 @@ public class StaffController {
         return ResponseEntity.status(HttpStatus.CREATED).body(staffService.create(dto));
     }
 
-    @PutMapping("{/id}")
+    @PutMapping("/{id}")
     public ResponseEntity<StaffResponseDTO> update(@PathVariable Long id,@RequestBody StaffRequestDTO dto){
         return ResponseEntity.ok(staffService.update(id,dto));
     }
 
-    @DeleteMapping("{/id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id){
         staffService.desactivate(id);
         return ResponseEntity.noContent().build();

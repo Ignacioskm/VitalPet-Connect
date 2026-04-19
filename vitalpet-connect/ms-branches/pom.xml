@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
     <groupId>com.vitalpet</groupId>
-    <artifactId>ms-branches</artifactId>
+    <artifactId>ms-branch</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <description>Sedes fisicas</description>
     <properties>

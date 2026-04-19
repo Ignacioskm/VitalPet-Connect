@@ -23,7 +23,7 @@ vitalpet-connect/
 ├── ms-payments/             # Pagos y facturación
 ├── ms-adoptions/            # Flujo de adopciones
 ├── ms-notifications/        # Alertas y recordatorios
-└── ms-branches/             # Sedes y sucursales
+└── ms-branch/             # Sedes y sucursales
 ```
 
 ## 🚀 Cómo levantar el proyecto
@@ -60,7 +60,7 @@ cd ms-users && mvn spring-boot:run
 | ms-payments | 8087 | Pagos y transacciones | 🟡 Media |
 | ms-adoptions | 8088 | Flujo de adopciones | 🟡 Media |
 | ms-notifications | 8089 | Alertas y recordatorios | 🟡 Media |
-| ms-branches | 8090 | Sedes y sucursales | 🟢 Baja |
+| ms-branch | 8090 | Sedes y sucursales | 🟢 Baja |
 | eureka-server | 8761 | Service Discovery | — |
 | api-gateway | 8080 | Puerta de entrada | — |
 
