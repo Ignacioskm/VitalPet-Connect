@@ -42,8 +42,7 @@ El ecosistema se divide en servicios especializados que se comunican mediante pe
 
 A pesar de que cada microservicio cuenta con su propia base de datos física para mantener la independencia, el siguiente diagrama representa la **relación lógica global** de las entidades para facilitar la comprensión del dominio completo:
 
-![Diagrama de Base de Datos](./docs/database_diagram.png) 
-*(Sugerencia: Guarda tu imagen o PDF en la ruta `/docs/database_diagram.png` dentro de tu repositorio).*
+[Diagrama.pdf](https://github.com/user-attachments/files/26875374/Diagrama.pdf)
 
 
 ## 🚀 Guía de Inicio Rápido
