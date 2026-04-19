@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,8 +17,9 @@ public class StaffRequestDTO {
     private String email;
     private String phoneNumber;
     private LocalDate hireDate;
-    //Se pedira el branchName para ir a buscar el id y verificarlo en el ms de branchs
-    private String branchName;
+    //Se pide el ID para verificar si la ID funciona (en el front esto sería una lista despegable)
+    private Long branchId;
     private String specialtyName;
+    private List<ScheduleRequestDTO> schedules; // <-- Horarios de nuestro Staff
 
 }

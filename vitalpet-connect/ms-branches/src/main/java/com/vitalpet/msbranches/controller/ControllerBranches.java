@@ -44,4 +44,8 @@ public class ControllerBranches {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> branchExistsById(@PathVariable Long id){
+        return ResponseEntity.ok(serviceBranches.branchExistsById(id));
+    }
 }

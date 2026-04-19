@@ -1,0 +1,15 @@
+INSERT IGNORE INTO cities (id, name) VALUES (1, 'Santiago');
+INSERT IGNORE INTO cities (id, name) VALUES (2, 'Valparaíso');
+INSERT IGNORE INTO cities (id, name) VALUES (3, 'Viña del Mar');
+INSERT IGNORE INTO cities (id, name) VALUES (4, 'Concepción');
+INSERT IGNORE INTO cities (id, name) VALUES (5, 'Temuco');
+INSERT IGNORE INTO cities (id, name) VALUES (6, 'Antofagasta');
+INSERT IGNORE INTO cities (id, name) VALUES (7, 'La Serena');
+INSERT IGNORE INTO cities (id, name) VALUES (8, 'Puerto Montt');
+INSERT IGNORE INTO cities (id, name) VALUES (9, 'Rancagua');
+INSERT IGNORE INTO cities (id, name) VALUES (10, 'Talca');
+INSERT IGNORE INTO cities (id, name) VALUES (11, 'Arica');
+INSERT IGNORE INTO cities (id, name) VALUES (12, 'Iquique');
+INSERT IGNORE INTO cities (id, name) VALUES (13, 'Chillán');
+INSERT IGNORE INTO cities (id, name) VALUES (14, 'Coyhaique');
+INSERT IGNORE INTO cities (id, name) VALUES (15, 'Punta Arenas');
