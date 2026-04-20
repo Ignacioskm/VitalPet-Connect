@@ -1,5 +1,6 @@
 package com.vitalpet.mspets.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.vitalpet.mspets.dto.PetRequestDTO;
 import com.vitalpet.mspets.dto.PetResponseDTO;
 import com.vitalpet.mspets.model.Pet;
@@ -54,9 +55,9 @@ public class PetService {
             throw new RuntimeException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");
         }
 
-       //falta aquí buscar por rol CLIENTE de user
-
         Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new RuntimeException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
+
+        //falta aquí buscar por rol CLIENTE de user
 
         Pet pet = new Pet();
         pet.setName(dto.getName());
