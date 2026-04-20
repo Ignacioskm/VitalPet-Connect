@@ -1,11 +1,11 @@
 server:
-  port: 8082
+  port: 8090
 
 spring:
   application:
     name: ms-users
   datasource:
-    url: jdbc:mysql://localhost:3306/vitalpet_users?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3307/vitalpet_users?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,6 +16,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true # Esto hace que hibernate espere creer las tablas pa meter los datos.
+  sql:
+    init:
+      mode: always #Con esta wea obligamos a buscar el archivo data.sql
 
 eureka:
   client:

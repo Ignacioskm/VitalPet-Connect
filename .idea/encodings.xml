@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/infrastructure/api-gateway/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/infrastructure/eureka-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-adoptions/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-appointments/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-branches/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-clinical-history/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-notifications/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-payments/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-pets/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-staff/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/vitalpet-connect/ms-users/src/main/java" charset="UTF-8" />
+  </component>
+</project>
