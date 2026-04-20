@@ -1,0 +1,20 @@
+package com.vitalpet.mspets.model;
+
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "species")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Species {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "name_species",nullable = false,unique = true)
+    private String name;
+}
