@@ -5,7 +5,7 @@ spring:
   application:
     name: ms-pets
   datasource:
-    url: jdbc:mysql://localhost:3306/vitalpet_pets?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3308/vitalpet_pets?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,6 +16,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true #Significa que hibernate crea las tablas
+  sql:
+    init:
+      mode: always #Siempre buscara data.sql para al crear la bd
 
 eureka:
   client:

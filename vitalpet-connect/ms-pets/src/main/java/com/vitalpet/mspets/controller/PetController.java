@@ -45,4 +45,15 @@ public class PetController {
 
     }
 
+    //Listar mascotas por dueño
+    @GetMapping("/{id}/owner")
+    public ResponseEntity<List<PetResponseDTO>> getPetsByOwnerId(@PathVariable Long id){
+        return ResponseEntity.ok(petService.getByOwnerId(id));
+    }
+
+    //Verificar si la mascota existe
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> petExists(@PathVariable Long id){
+        return ResponseEntity.ok(petService.petExists(id));
+    }
 }
