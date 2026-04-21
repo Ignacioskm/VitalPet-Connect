@@ -23,7 +23,7 @@ public class PetService {
     private SpeciesRepository speciesRepository;
 
     @Autowired
-    private UserClient userOwner;
+    private UserClient userClient;
 
     private PetResponseDTO toDTO(Pet pet) {
         PetResponseDTO dto = new PetResponseDTO();
@@ -35,6 +35,7 @@ public class PetService {
         dto.setActive(pet.getActive());
         dto.setCreatedAt(pet.getCreatedAt());
         dto.setSpeciesId(pet.getSpecies().getId());
+        dto.setOwnerId(pet.getOwnerId());
         return dto;
     }
 
@@ -48,7 +49,7 @@ public class PetService {
     }
 
     public PetResponseDTO create(PetRequestDTO dto) {
-        Boolean userExist = userOwner.existById(dto.getOwnerId());
+        Boolean userExist = userClient.existById(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(userExist)) {
             throw new RuntimeException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");
@@ -57,8 +58,11 @@ public class PetService {
         Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new RuntimeException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
 
         //falta aquí buscar por rol CLIENTE de user
+        Boolean isClient = userClient.isClient(dto.getOwnerId());
 
-
+        if (Boolean.FALSE.equals(isClient)){
+            throw new RuntimeException("Error: El user no es un cliente.");
+        }
 
         Pet pet = new Pet();
         pet.setName(dto.getName());
@@ -77,10 +81,16 @@ public class PetService {
 
         Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new RuntimeException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
 
-        Boolean userExist = userOwner.existById(dto.getOwnerId());
+        Boolean userExist = userClient.existById(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(userExist)) {
             throw new RuntimeException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");
+        }
+
+        Boolean isClient = userClient.isClient(dto.getOwnerId());
+
+        if (Boolean.FALSE.equals(isClient)){
+            throw new RuntimeException("Error: El user no es un cliente.");
         }
 
         existing.setName(dto.getName());
@@ -101,6 +111,7 @@ public class PetService {
         petRepository.save(pet);
     }
 
+    //Traer lista de mascotas de cada dueño
     public  List<PetResponseDTO> getByOwnerId(Long ownerId) {
         return petRepository.findByOwnerId(ownerId).stream().map(this::toDTO).collect(Collectors.toList());
     }
@@ -108,5 +119,10 @@ public class PetService {
 
     public List<PetResponseDTO> getBySpeciesName(String speciesName) {
         return petRepository.findBySpeciesName(speciesName).stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    //Validar si el pet existe
+    public boolean petExists(Long id){
+        return petRepository.existsPetById(id);
     }
 }

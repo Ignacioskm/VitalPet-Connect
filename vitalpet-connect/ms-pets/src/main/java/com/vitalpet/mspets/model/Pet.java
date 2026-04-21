@@ -41,7 +41,7 @@ public class Pet {
 
     //Relación con Species
     @ManyToOne
-    @Column(name = "species_name",nullable = false)
+    @JoinColumn(name = "species_id", nullable = false)
     private Species species;
 
     //Relación con User mediante owner_id
