@@ -19,6 +19,6 @@ private LocalDate birthDate;
 private double weight;
 private boolean active;
 private LocalDateTime createdAt;
-private String speciesName; //Para devolver solo el nombre y no el objeto entero OjO
+private Long speciesId; //Para devolver solo el nombre y no el objeto entero OjO
 private Long ownerId;
 }

@@ -58,5 +58,10 @@ public class UserController {
     public ResponseEntity<Boolean> userExistsById(@PathVariable Long id){
         return ResponseEntity.ok(userService.UserExistsById(id));
     }
+
+    @GetMapping("/{id}/isClient")
+    public ResponseEntity<Boolean> isClient(@PathVariable Long id){
+        return ResponseEntity.ok(userService.isClient(id));
+    }
 }
 

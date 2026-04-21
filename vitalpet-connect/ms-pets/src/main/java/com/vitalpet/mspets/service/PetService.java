@@ -1,11 +1,10 @@
 package com.vitalpet.mspets.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.vitalpet.mspets.dto.PetRequestDTO;
 import com.vitalpet.mspets.dto.PetResponseDTO;
 import com.vitalpet.mspets.model.Pet;
 import com.vitalpet.mspets.model.Species;
-import com.vitalpet.mspets.owner.UserOwner;
+import com.vitalpet.mspets.client.UserClient;
 import com.vitalpet.mspets.repository.PetRepository;
 import com.vitalpet.mspets.repository.SpeciesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ public class PetService {
     private SpeciesRepository speciesRepository;
 
     @Autowired
-    private UserOwner userOwner;
+    private UserClient userOwner;
 
     private PetResponseDTO toDTO(Pet pet) {
         PetResponseDTO dto = new PetResponseDTO();
@@ -35,7 +34,7 @@ public class PetService {
         dto.setWeight(pet.getWeight());
         dto.setActive(pet.getActive());
         dto.setCreatedAt(pet.getCreatedAt());
-        dto.setSpeciesName(pet.getSpecies().getName());
+        dto.setSpeciesId(pet.getSpecies().getId());
         return dto;
     }
 
@@ -49,7 +48,7 @@ public class PetService {
     }
 
     public PetResponseDTO create(PetRequestDTO dto) {
-        Boolean userExist = userOwner.existByid(dto.getOwnerId());
+        Boolean userExist = userOwner.existById(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(userExist)) {
             throw new RuntimeException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");
@@ -58,6 +57,8 @@ public class PetService {
         Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new RuntimeException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
 
         //falta aquí buscar por rol CLIENTE de user
+
+
 
         Pet pet = new Pet();
         pet.setName(dto.getName());
@@ -76,7 +77,7 @@ public class PetService {
 
         Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new RuntimeException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
 
-        Boolean userExist = userOwner.existByid(dto.getOwnerId());
+        Boolean userExist = userOwner.existById(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(userExist)) {
             throw new RuntimeException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");

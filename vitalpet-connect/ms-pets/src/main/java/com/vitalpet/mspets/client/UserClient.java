@@ -1,13 +1,12 @@
-package com.vitalpet.mspets.owner;
+package com.vitalpet.mspets.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "ms-users")
-public interface UserOwner {
+public interface UserClient {
 
     @GetMapping("/api/users/{id}/exists")
-    Boolean existByid(@PathVariable Long id);
+    Boolean existById(@PathVariable Long id);
 }
