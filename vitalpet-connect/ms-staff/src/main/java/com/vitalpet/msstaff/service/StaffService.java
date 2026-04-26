@@ -161,4 +161,18 @@ public class StaffService {
         staff.setActive(false);
         staffRepository.save(staff);
     }
+
+    //Listamos staff por sede
+    public List<StaffResponseDTO> findStaffByBranchId(Long branchId){
+
+        //Primero verificamos que la sede existe
+        Boolean branchExists = branchClient.existsById(branchId);
+
+        if(Boolean.FALSE.equals(branchExists)){
+            throw new RuntimeException("Error: La sucursal con ID" + branchId + "no existe");
+        }
+
+        //Ahora creamos la lógica para buscar a todos los staff que tengan esa branchId
+        return staffRepository.findByBranchId(branchId).stream().map(this::toDTO).collect(Collectors.toList());
+    }
 }

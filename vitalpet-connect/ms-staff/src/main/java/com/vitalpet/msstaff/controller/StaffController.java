@@ -3,6 +3,7 @@ package com.vitalpet.msstaff.controller;
 import com.vitalpet.msstaff.dto.StaffRequestDTO;
 import com.vitalpet.msstaff.dto.StaffResponseDTO;
 import com.vitalpet.msstaff.service.StaffService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,5 +42,11 @@ public class StaffController {
     public ResponseEntity<Void> delete(@PathVariable Long id){
         staffService.desactivate(id);
         return ResponseEntity.noContent().build();
+    }
+
+    //Listar staffs por sede
+    @GetMapping("/branch/{branchId}")
+    public ResponseEntity<List<StaffResponseDTO>> findStaffByBranchId(@Valid @PathVariable Long branchId){
+        return ResponseEntity.ok(staffService.findStaffByBranchId(branchId));
     }
 }
