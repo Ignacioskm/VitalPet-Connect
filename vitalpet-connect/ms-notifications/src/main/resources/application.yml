@@ -16,7 +16,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
-
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 eureka:
   client:
     service-url:
