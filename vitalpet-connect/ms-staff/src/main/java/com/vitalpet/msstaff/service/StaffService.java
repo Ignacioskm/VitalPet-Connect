@@ -175,4 +175,9 @@ public class StaffService {
         //Ahora creamos la lógica para buscar a todos los staff que tengan esa branchId
         return staffRepository.findByBranchId(branchId).stream().map(this::toDTO).collect(Collectors.toList());
     }
+
+    //Verificar si existe
+    public boolean staffExistsById(Long id){
+        return staffRepository.existsById(id);
+    }
 }

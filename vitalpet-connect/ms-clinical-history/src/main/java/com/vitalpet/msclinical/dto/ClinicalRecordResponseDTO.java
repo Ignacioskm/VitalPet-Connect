@@ -5,19 +5,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClinicalRequestDTO {
-
-    private String diagnosis;
+public class ClinicalRecordResponseDTO {
+    private Long id;
+    private LocalDate visitDate;
     private String reason;
+    private String diagnosis;
     private String treatment;
     private String notes;
 
-    private LocalDate visitDate;
-
     private Long petId;
     private Long staffId;
+
+    private List<PrescriptionResponseDTO> prescriptions;
 }
