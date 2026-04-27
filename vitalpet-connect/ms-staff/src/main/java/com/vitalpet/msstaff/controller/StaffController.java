@@ -49,4 +49,10 @@ public class StaffController {
     public ResponseEntity<List<StaffResponseDTO>> findStaffByBranchId(@Valid @PathVariable Long branchId){
         return ResponseEntity.ok(staffService.findStaffByBranchId(branchId));
     }
+
+    //Endpoint de consumo para verificar si existe el staff
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> staffExistsById(@PathVariable Long id){
+        return ResponseEntity.ok(staffService.staffExistsById(id));
+    }
 }

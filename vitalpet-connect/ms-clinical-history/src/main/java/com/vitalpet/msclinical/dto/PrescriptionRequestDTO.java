@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 public class PrescriptionRequestDTO {
     private String medicationName;
     private String dosage;
-
     private Integer durationDays;
 }
