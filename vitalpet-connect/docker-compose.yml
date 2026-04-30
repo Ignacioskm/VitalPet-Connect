@@ -5,15 +5,15 @@ services:
   db-auth:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_auth
     ports:
-      - "3306:3306"
+      - "3316:3306"
 
   db-users:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_users
     ports:
       - "3307:3306"
@@ -21,7 +21,7 @@ services:
   db-pets:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_pets
     ports:
       - "3308:3306"
@@ -29,7 +29,7 @@ services:
   db-clinical-history:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_clinical
     ports:
       - "3309:3306"
@@ -37,7 +37,7 @@ services:
   db-appointments:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_appointments
     ports:
       - "3310:3306"
@@ -45,7 +45,7 @@ services:
   db-staff:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_staff
     ports:
       - "3311:3306"
@@ -53,7 +53,7 @@ services:
   db-payments:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_payments
     ports:
       - "3312:3306"
@@ -61,7 +61,7 @@ services:
   db-adoptions:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_adoptions
     ports:
       - "3313:3306"
@@ -69,7 +69,7 @@ services:
   db-notifications:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_notifications
     ports:
       - "3314:3306"
@@ -77,7 +77,7 @@ services:
   db-branches:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: vitalpet_branches
     ports:
       - "3315:3306"
