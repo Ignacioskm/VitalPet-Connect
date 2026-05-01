@@ -30,4 +30,9 @@ public class ClinicalController {
     public ResponseEntity<List<ClinicalRecordResponseDTO>> getPetHistory(@PathVariable Long petId){
         return ResponseEntity.ok(clinicalService.getHistoryByPet(petId));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClinicalRecordResponseDTO> getById(@PathVariable Long id){
+        return ResponseEntity.ok(clinicalService.getByID(id));
+    }
 }

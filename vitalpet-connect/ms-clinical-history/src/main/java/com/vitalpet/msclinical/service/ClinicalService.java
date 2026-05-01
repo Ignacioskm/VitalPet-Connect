@@ -9,7 +9,6 @@ import com.vitalpet.msclinical.dto.PrescriptionResponseDTO;
 import com.vitalpet.msclinical.model.ClinicalRecord;
 import com.vitalpet.msclinical.model.Prescription;
 import com.vitalpet.msclinical.repository.ClinicalRecordRepository;
-import com.vitalpet.msclinical.repository.PrescriptionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +65,11 @@ public class ClinicalService {
         return clinicalRepository.findByPetIdOrderByVisitDateDesc(petId).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-
+    //Buscar por id
+    public ClinicalRecordResponseDTO getByID(Long id){
+        ClinicalRecord clinicalRecord = clinicalRepository.findById(id).orElseThrow(() -> new RuntimeException("Clínica no encontrada."));
+        return toDTO(clinicalRecord);
+    }
 
 
     //Prescription de DTO a Entity
