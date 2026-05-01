@@ -87,6 +87,17 @@ public class ServiceBranches {
         repositoryBranches.save(branch);
     }
 
+    //Traer sucursales por ciudad
+    public List<BranchesResponseDTO> findByCityId(Long cityId){
+        boolean cityExists = repositoryCity.existsById(cityId);
+
+        if(!cityExists){
+            throw new RuntimeException("La ciudad : " + cityId + " no existe.");
+        }
+
+        return repositoryBranches.findByCityIdAndActiveTrue(cityId).stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
     //Verificar si la sucursal existe
     public boolean branchExistsById(Long id){
         return repositoryBranches.existsById(id);

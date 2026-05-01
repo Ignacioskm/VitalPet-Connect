@@ -5,9 +5,9 @@ spring:
   application:
     name: ms-pets
   datasource:
-    url: jdbc:mysql://localhost:3306/vitalpet_pets?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3308/vitalpet_pets?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: root
+    password: ${DB_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -16,6 +16,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true #Significa que hibernate crea las tablas
+  sql:
+    init:
+      mode: always #Siempre buscara data.sql para al crear la bd
 
 eureka:
   client:
@@ -23,3 +27,10 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
+
+#Rutas swagger
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

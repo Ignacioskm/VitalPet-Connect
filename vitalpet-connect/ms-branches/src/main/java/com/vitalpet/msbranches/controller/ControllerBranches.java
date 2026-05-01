@@ -4,6 +4,7 @@ package com.vitalpet.msbranches.controller;
 import com.vitalpet.msbranches.dto.BranchesRequestDTO;
 import com.vitalpet.msbranches.dto.BranchesResponseDTO;
 import com.vitalpet.msbranches.service.ServiceBranches;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,5 +48,11 @@ public class ControllerBranches {
     @GetMapping("/{id}/exists")
     public ResponseEntity<Boolean> branchExistsById(@PathVariable Long id){
         return ResponseEntity.ok(serviceBranches.branchExistsById(id));
+    }
+
+    //Listar sucursales por ciudad
+    @GetMapping("/city/{cityId}")
+    public ResponseEntity<List<BranchesResponseDTO>> branchByCity(@Valid @PathVariable Long cityId){
+        return ResponseEntity.ok(serviceBranches.findByCityId(cityId));
     }
 }

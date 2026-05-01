@@ -5,9 +5,9 @@ spring:
   application:
     name: ms-appointments
   datasource:
-    url: jdbc:mysql://localhost:3306/vitalpet_appointments?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3310/vitalpet_appointments?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
-    password: root
+    password: ${DB_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -16,6 +16,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true #pa que hibernate cree las tablas luego de meter los datos.
+  sql:
+    init:
+      mode: always #Para que inicie con data.sql
 
 eureka:
   client:
@@ -23,3 +27,10 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
+
+#Rutas swagger
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

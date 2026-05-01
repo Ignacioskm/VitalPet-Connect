@@ -14,6 +14,7 @@ public interface RepositoryBranches extends JpaRepository<Branch,Long> {
     boolean existsByAddress(String address);
 
     List<Branch> findByActiveTrue();
-    List<Branch> findByCityId(Long cityId);
 
+    //Para que nos busque por ciudad y activas.
+    List<Branch> findByCityIdAndActiveTrue(Long cityId);
 }

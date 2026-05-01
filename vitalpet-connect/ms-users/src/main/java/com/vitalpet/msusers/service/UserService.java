@@ -107,4 +107,10 @@ public class UserService {
     public List<UserResponseDTO> getUsersByRol(String roleName){
         return userRepository.findByRoleName(roleName).stream().map(this::toDTO).collect(Collectors.toList());
     }
+
+    //Verificar si el user es Cliente
+    public Boolean isClient(Long id){
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return user.getRole().getName().equalsIgnoreCase("CLIENT");
+    }
 }
