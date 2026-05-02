@@ -113,4 +113,9 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         return user.getRole().getName().equalsIgnoreCase("CLIENT");
     }
+
+    //Metodo que se usará para obtener el email en el ms-notifications
+    public String getEmailById(Long id) {
+        return userRepository.findEmailById(id).orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no encontrado o no tiene email"));
+    }
 }

@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "ms-users")
 public interface UserClient {
-    @GetMapping("/api/user/{id}/exists")
-    Boolean existById(@PathVariable Long id);
+    @GetMapping("/api/user/{id}/email")
+    String getEmailById(@PathVariable("id") Long id);
 }

@@ -64,5 +64,11 @@ public class UserController {
     public ResponseEntity<Boolean> isClient(@PathVariable Long id){
         return ResponseEntity.ok(userService.isClient(id));
     }
+
+    //Endpoint para obtener SOLO el email (ms-notifications)
+    @GetMapping("/{id}/email")
+    public ResponseEntity<String> getEmailById(@PathVariable Long id){
+        return ResponseEntity.ok(userService.getEmailById(id));
+    }
 }
 
