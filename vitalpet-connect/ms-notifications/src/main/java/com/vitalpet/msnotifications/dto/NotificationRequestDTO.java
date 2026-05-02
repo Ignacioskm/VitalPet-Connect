@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NotificationRequestDTO {
+    private Long userId;
+    private String type;
     private String message;
-    private Boolean readFlag;
-    private LocalDate sentAt;
 }
