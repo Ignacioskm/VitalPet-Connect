@@ -56,4 +56,10 @@ public class PetController {
     public ResponseEntity<Boolean> petExists(@PathVariable Long id){
         return ResponseEntity.ok(petService.petExists(id));
     }
+
+    //Verificar si la mascota sigue estando disponible para Adopción por medio del Owner ID 8si es nulo)
+    @GetMapping("/available")
+    public ResponseEntity<List<PetResponseDTO>> getAvailablePets() {
+        return ResponseEntity.ok(petService.getAvailablePets());
+    }
 }

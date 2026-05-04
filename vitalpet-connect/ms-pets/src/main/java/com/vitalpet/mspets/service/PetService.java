@@ -39,6 +39,10 @@ public class PetService {
         return dto;
     }
 
+    public List<PetResponseDTO> getAvailablePets() {
+        return petRepository.findByOwnerIdIsNull().stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
     public List<PetResponseDTO> getAll() {
         return petRepository.findByActiveTrue().stream().map(this::toDTO).collect(Collectors.toList());
     }
@@ -57,7 +61,6 @@ public class PetService {
 
         Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new RuntimeException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
 
-        //falta aquí buscar por rol CLIENTE de user
         Boolean isClient = userClient.isClient(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(isClient)){
