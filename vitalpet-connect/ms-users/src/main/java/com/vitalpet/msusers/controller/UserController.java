@@ -4,6 +4,7 @@ import com.vitalpet.msusers.dto.UserRequestDTO;
 import com.vitalpet.msusers.dto.UserResponseDTO;
 import com.vitalpet.msusers.model.User;
 import com.vitalpet.msusers.service.UserService;
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,12 +33,12 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO dto){
+    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @RequestBody UserRequestDTO dto){
+    public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UserRequestDTO dto){
         return ResponseEntity.ok(userService.update(id,dto));
     }
 

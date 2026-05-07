@@ -29,12 +29,12 @@ public class StaffController {
     }
 
     @PostMapping
-    public ResponseEntity<StaffResponseDTO> create(@RequestBody StaffRequestDTO dto){
+    public ResponseEntity<StaffResponseDTO> create(@Valid @RequestBody StaffRequestDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(staffService.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StaffResponseDTO> update(@PathVariable Long id,@RequestBody StaffRequestDTO dto){
+    public ResponseEntity<StaffResponseDTO> update(@PathVariable Long id,@Valid @RequestBody StaffRequestDTO dto){
         return ResponseEntity.ok(staffService.update(id,dto));
     }
 
@@ -46,7 +46,7 @@ public class StaffController {
 
     //Listar staffs por sede
     @GetMapping("/branch/{branchId}")
-    public ResponseEntity<List<StaffResponseDTO>> findStaffByBranchId(@Valid @PathVariable Long branchId){
+    public ResponseEntity<List<StaffResponseDTO>> findStaffByBranchId(@PathVariable Long branchId){
         return ResponseEntity.ok(staffService.findStaffByBranchId(branchId));
     }
 
