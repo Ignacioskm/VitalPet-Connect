@@ -4,6 +4,7 @@ import com.vitalpet.msadoptions.dto.AdoptionRequestDTO;
 import com.vitalpet.msadoptions.dto.AdoptionResponseDTO;
 import com.vitalpet.msadoptions.dto.PetResponseDTO;
 import com.vitalpet.msadoptions.service.AdoptionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class AdoptionController {
     }
 
     @PostMapping
-    public ResponseEntity<AdoptionResponseDTO> create(@RequestBody AdoptionRequestDTO dto){
+    public ResponseEntity<AdoptionResponseDTO> create(@Valid @RequestBody AdoptionRequestDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(adoptionService.create(dto));
     }
 

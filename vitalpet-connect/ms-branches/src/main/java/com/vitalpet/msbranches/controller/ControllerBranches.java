@@ -30,12 +30,12 @@ public class ControllerBranches {
     }
 
     @PostMapping
-    public ResponseEntity<BranchesResponseDTO> create(@RequestBody BranchesRequestDTO dto) {
+    public ResponseEntity<BranchesResponseDTO> create(@Valid @RequestBody BranchesRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(serviceBranches.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BranchesResponseDTO> update(@PathVariable Long id, @RequestBody BranchesRequestDTO dto) {
+    public ResponseEntity<BranchesResponseDTO> update(@PathVariable Long id, @Valid @RequestBody BranchesRequestDTO dto) {
         return ResponseEntity.ok(serviceBranches.update(id,dto));
     }
 
@@ -52,7 +52,7 @@ public class ControllerBranches {
 
     //Listar sucursales por ciudad
     @GetMapping("/city/{cityId}")
-    public ResponseEntity<List<BranchesResponseDTO>> branchByCity(@Valid @PathVariable Long cityId){
+    public ResponseEntity<List<BranchesResponseDTO>> branchByCity(@PathVariable Long cityId){
         return ResponseEntity.ok(serviceBranches.findByCityId(cityId));
     }
 }

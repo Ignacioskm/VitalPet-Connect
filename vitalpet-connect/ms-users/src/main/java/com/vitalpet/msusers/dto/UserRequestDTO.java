@@ -10,14 +10,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRequestDTO {
+
+    @NotBlank(message = "El nombre no puede estar vacío.")
     private String firstName;
+
+    @NotBlank(message = "El apellido no puede estar vacío.")
     private String lastName;
 
     @NotBlank(message = "El correo no puede estar vacío.")
     @Email(message = "Debe ser un correo electrónico válido.")
     private String email;
 
+    @NotBlank(message = "Debe ingresar un número de teléfono.")
     private String phoneNumber;
+
+    @NotBlank(message = "La dirección no puede estar vacía.")
     private String address;
+
+    @NotBlank(message = "Debe ingresar el rol del usuario: CLIENT, VET, RECEPTIONIST, ADMIN.")
     private String roleName;
 }
