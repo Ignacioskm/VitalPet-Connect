@@ -62,4 +62,10 @@ public class PetController {
     public ResponseEntity<List<PetResponseDTO>> getAvailablePets() {
         return ResponseEntity.ok(petService.getAvailablePets());
     }
+
+    @PutMapping("/{petId}/owner/{userId}")
+    public ResponseEntity<Void> assignOwner(@PathVariable Long petId, @PathVariable Long userId){
+        petService.assignOwner(petId,userId);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -9,12 +9,4 @@ import java.util.List;
 @Repository
 public interface AdoptionRepository extends JpaRepository<Adoption, Long> {
 
-    List<Adoption> findByActiveTrue();
-
-    List<Adoption> findByUserId(Long userId);
-
-    List<Adoption> findByStaffId(Long staffId);
-
-    boolean findByPetId(Long petId);
-
 }

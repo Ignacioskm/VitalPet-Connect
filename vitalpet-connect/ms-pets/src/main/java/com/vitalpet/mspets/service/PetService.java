@@ -128,4 +128,16 @@ public class PetService {
     public boolean petExists(Long id){
         return petRepository.existsPetById(id);
     }
+
+    public void assignOwner(Long petId,Long userId){
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Mascota no encontrada."));
+
+        Boolean userExist = userClient.existById(userId);
+        if(Boolean.FALSE.equals(userExist)){
+            throw new RuntimeException("Usuario no encontrado");
+        }
+
+        pet.setOwnerId(userId);
+        petRepository.save(pet);
+    }
 }

@@ -5,7 +5,7 @@ spring:
   application:
     name: ms-adoptions
   datasource:
-    url: jdbc:mysql://localhost:3306/vitalpet_adoptions?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3313/vitalpet_adoptions?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: ${DB_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,6 +16,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 
 eureka:
   client:

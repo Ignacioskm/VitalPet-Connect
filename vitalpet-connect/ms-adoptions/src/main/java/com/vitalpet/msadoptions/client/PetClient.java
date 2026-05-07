@@ -1,8 +1,10 @@
 package com.vitalpet.msadoptions.client;
 
+import com.vitalpet.msadoptions.dto.PetResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 
@@ -13,6 +15,8 @@ public interface PetClient {
     Boolean existById(@PathVariable Long id);
 
     @GetMapping("/api/pets/available")
-    List<Object> getAvailablePets();
+    List<PetResponseDTO> getAvailablePets();
 
+    @PutMapping("/api/pets/{petId}/owner/{userId}")
+    Void updateOwner(@PathVariable Long petId, @PathVariable Long userId);
 }

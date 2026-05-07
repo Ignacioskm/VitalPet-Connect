@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -21,8 +20,5 @@ public class AdoptionRequestDTO {
 
     @NotBlank(message = "El ID del dueño es obligatorio.")
     private Long userId;
-
-    @NotBlank(message = "El ID del Staff es obligatorio.")
-    private Long staffId;
 
 }

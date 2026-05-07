@@ -22,7 +22,7 @@ public class Adoption {
     @Column(name = "request_date", nullable = false)
     private LocalDateTime requestDate;
 
-    @Column(name = "resolve_date", nullable = false)
+    @Column(name = "resolve_date") //Este nace "PENDING" y cambia de valor cuando la adopción es aprobada y/o rechazada
     private LocalDateTime resolveDate;
 
     @Column(columnDefinition = "TEXT")
@@ -31,7 +31,6 @@ public class Adoption {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
 
     //Para referenciar a AdoptionStatus
     @ManyToOne
@@ -42,9 +41,9 @@ public class Adoption {
     @Column(name = "pet_id", nullable = false)
     private Long petId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false) //el cliente que quiere adoptar es este
     private Long userId;
 
-    @Column(name = "staff_id", nullable = false)
+    @Column(name = "staff_id")
     private Long staffId;
 }
