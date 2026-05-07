@@ -34,7 +34,7 @@ public class StaffController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<StaffResponseDTO> update(@PathVariable Long id,@Valid @RequestBody StaffRequestDTO dto){
+    public ResponseEntity<StaffResponseDTO> update(@PathVariable Long id, @Valid @RequestBody StaffRequestDTO dto){
         return ResponseEntity.ok(staffService.update(id,dto));
     }
 

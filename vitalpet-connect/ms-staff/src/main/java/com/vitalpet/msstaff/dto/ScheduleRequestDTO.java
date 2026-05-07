@@ -1,7 +1,6 @@
 package com.vitalpet.msstaff.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,14 +14,13 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class ScheduleRequestDTO {
 
-    @NotNull(message = "El día de la semana no puede estar vacío.")
+    @NotNull(message = "Debe ingresar un día de la semana.")
     private DayOfWeek dayOfWeek;
 
-    @NotNull(message = "El comienzo del turno no puede estar vacío.")
-    @JsonFormat(pattern = "HH:mm:ss")
+    //Revisar si debe llevar formato/pattern
+    @NotNull(message = "Debe ingresar el inicio del turno.")
     private LocalTime startTime;
 
-    @NotNull(message = "El término del turno no puede estar vacío.")
-    @JsonFormat(pattern = "HH:mm:ss")
+    @NotNull(message = "Debe ingresar el fin del turno.")
     private LocalTime endTime;
 }

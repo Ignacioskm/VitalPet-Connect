@@ -30,8 +30,8 @@ public class StaffRequestDTO {
     @NotBlank(message = "Debe ingresar un número telefónico.")
     private String phoneNumber;
 
-    @NotNull(message = "Deebe ingresar la fecha de contratación.")
-    @JsonFormat(pattern = "HH:mm:ss")
+    @NotNull(message = "Debe ingresar la fecha de contratación.")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @PastOrPresent(message = "La fecha de contratación no puede ser posterior a la fecha de hoy.")
     private LocalDate hireDate;
 

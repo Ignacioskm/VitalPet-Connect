@@ -21,7 +21,7 @@ public class ClinicalController {
 
     //Crear nueva ficha con receta
     @PostMapping
-    public ResponseEntity<ClinicalRecordResponseDTO> createRecord(@RequestBody @Valid ClinicalRecordRequestDTO dto){
+    public ResponseEntity<ClinicalRecordResponseDTO> createRecord(@Valid @RequestBody ClinicalRecordRequestDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(clinicalService.create(dto));
     }
 

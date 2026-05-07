@@ -28,6 +28,6 @@ public class UserRequestDTO {
     @NotBlank(message = "La dirección no puede estar vacía.")
     private String address;
 
-    @NotBlank(message = "Debe tener un rol de usuario: CLIENT, VET, RECEPTIONIST, ADMIN.")
+    @NotBlank(message = "Debe ingresar el rol del usuario: CLIENT, VET, RECEPTIONIST, ADMIN.")
     private String roleName;
 }

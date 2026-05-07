@@ -4,6 +4,7 @@ package com.vitalpet.mspets.controller;
 import com.vitalpet.mspets.dto.PetRequestDTO;
 import com.vitalpet.mspets.dto.PetResponseDTO;
 import com.vitalpet.mspets.service.PetService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +30,12 @@ public class PetController {
     }
 
     @PostMapping
-    public ResponseEntity<PetResponseDTO> create(@RequestBody PetRequestDTO dto) {
+    public ResponseEntity<PetResponseDTO> create(@Valid @RequestBody PetRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(petService.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PetResponseDTO> update(@PathVariable Long id, @RequestBody PetRequestDTO dto) {
+    public ResponseEntity<PetResponseDTO> update(@PathVariable Long id, @Valid @RequestBody PetRequestDTO dto) {
         return ResponseEntity.ok(petService.update(id,dto));
     }
 
