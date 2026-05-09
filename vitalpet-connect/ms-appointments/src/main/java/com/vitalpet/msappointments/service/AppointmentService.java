@@ -82,7 +82,23 @@ public class AppointmentService {
         return toDTO(appointmentRepository.save(appointment));
     }
 
+    //complete (terminar pago)
 
+
+    public AppointmentResponseDTO completeAppointment(Long id){
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+
+        AppointmentStatus appointmentStatus = appointmentStatusRepository.findByName("COMPLETED")
+                .orElseThrow(()-> new RuntimeException("Estado COMPLETED no encontrado"));
+
+        appointment.setAppointmentStatus(appointmentStatus);
+        Appointment saveAppointment = appointmentRepository.save(appointment);
+
+        //Aqui hay que ver como hacemos el pago en payments
+
+
+        return toDTO(saveAppointment);
+    }
 
     //MAPEADOR
     private AppointmentResponseDTO toDTO(Appointment app){
