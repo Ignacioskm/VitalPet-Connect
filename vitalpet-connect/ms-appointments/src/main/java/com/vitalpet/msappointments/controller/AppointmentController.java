@@ -43,5 +43,9 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.changeStatus(id,"CANCELLED"));
     }
 
-    //Falta El de complete que hay que validar el pago
+    //Falta el complete que hay que validar el pago con el ms payments
+    @PutMapping("/{id}/complete")
+    public ResponseEntity<AppointmentResponseDTO> complete(@PathVariable Long id){
+        return ResponseEntity.ok(appointmentService.completeAppointment(id));
+    }
 }
