@@ -2,6 +2,7 @@ package com.vitalpet.msusers.service;
 
 import com.vitalpet.msusers.dto.UserRequestDTO;
 import com.vitalpet.msusers.dto.UserResponseDTO;
+import com.vitalpet.msusers.exception.ResourceNotFoundException;
 import com.vitalpet.msusers.model.Role;
 import com.vitalpet.msusers.model.User;
 import com.vitalpet.msusers.repository.RoleRepository;
@@ -47,7 +48,7 @@ public class UserService {
 
     //Aca importante acordarse que findById devuelve un Optional! (Leer notas Notion)
     public UserResponseDTO getById(Long id){
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return toDTO(user);
     }
 
@@ -55,11 +56,11 @@ public class UserService {
     //Crear usuario DTO **Recordar que el requestDTO es lo que el cliente envía.
     public UserResponseDTO create(UserRequestDTO dto){
         if(userRepository.existsByEmail(dto.getEmail())){
-            throw new RuntimeException("El email ya está registrado");
+            throw new IllegalArgumentException("El email ya está registrado");
         }
 
         //Buscamos rol por el nombre
-        Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(() -> new RuntimeException("Rol no encontrado" + dto.getRoleName()));
+        Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(() -> new ResourceNotFoundException("Rol no encontrado" + dto.getRoleName()));
 
         User user = new User();
         user.setFirstName(dto.getFirstName());
@@ -74,9 +75,9 @@ public class UserService {
 
     //Update usuario DTO
     public UserResponseDTO update(Long id, UserRequestDTO dto){
-        User existing = userRepository.findById(id).orElseThrow(()-> new RuntimeException("Usuario no encontrado"));
+        User existing = userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Usuario no encontrado"));
 
-        Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(()-> new RuntimeException("Rol no encontrado" + dto.getRoleName()));
+        Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(()-> new ResourceNotFoundException("Rol no encontrado" + dto.getRoleName()));
 
 
         existing.setFirstName(dto.getFirstName());
@@ -91,7 +92,7 @@ public class UserService {
 
     //DESACTIVAMOS un usuario.
     public void deactivate(Long id){
-        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("Usuario no encontrado"));
+        User user = userRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Usuario no encontrado"));
 
         user.setActive(false);
         userRepository.save(user);
@@ -110,12 +111,12 @@ public class UserService {
 
     //Verificar si el user es Cliente
     public Boolean isClient(Long id){
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return user.getRole().getName().equalsIgnoreCase("CLIENT");
     }
 
     //Metodo que se usará para obtener el email en el ms-notifications
     public String getEmailById(Long id) {
-        return userRepository.findEmailById(id).orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no encontrado o no tiene email"));
+        return userRepository.findEmailById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + id + " no encontrado o no tiene email"));
     }
 }
