@@ -13,7 +13,8 @@ public class AppointmentResponseDTO {
 
     private Long id;
     private LocalDateTime scheduledAt;
-    private String reason;
+    private String medicalServiceName;
+    private Double price;
     private String notes;
     private LocalDateTime createdAt;
 

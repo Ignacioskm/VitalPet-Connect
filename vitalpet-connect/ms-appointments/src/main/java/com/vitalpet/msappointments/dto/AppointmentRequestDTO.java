@@ -2,6 +2,7 @@ package com.vitalpet.msappointments.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,8 @@ public class AppointmentRequestDTO {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") //Esto se lo pregunté a la IA para menejar la fecha así: "2026-05-05T15:30:00"
     private LocalDateTime scheduledAt;
 
-    @NotBlank(message = "La razón de atencion no puede estar vacio")
-    private String reason;
+    @NotNull(message = "El id del servicio médico no puede estar vacío")
+    private Long medicalServiceId;
 
     @NotBlank(message = "El campo de notas no puede estar vacio")
     private String notes;

@@ -6,10 +6,14 @@ import com.vitalpet.msappointments.client.PetClient;
 import com.vitalpet.msappointments.client.StaffClient;
 import com.vitalpet.msappointments.dto.AppointmentRequestDTO;
 import com.vitalpet.msappointments.dto.AppointmentResponseDTO;
+import com.vitalpet.msappointments.dto.PaymentRequestDTO;
+import com.vitalpet.msappointments.dto.PetResponseDTO;
 import com.vitalpet.msappointments.model.Appointment;
 import com.vitalpet.msappointments.model.AppointmentStatus;
+import com.vitalpet.msappointments.model.MedicalService;
 import com.vitalpet.msappointments.repository.AppointmentRepository;
 import com.vitalpet.msappointments.repository.AppointmentStatusRepository;
+import com.vitalpet.msappointments.repository.MedicalServiceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +26,7 @@ public class AppointmentService {
     //Repositorios
     @Autowired private AppointmentRepository appointmentRepository;
     @Autowired private AppointmentStatusRepository appointmentStatusRepository;
+    @Autowired private MedicalServiceRepository medicalServiceRepository;
 
     //Clientes OpenFeign
     @Autowired private PetClient petClient;
@@ -42,6 +47,9 @@ public class AppointmentService {
             throw new RuntimeException("El vet ya tiene una cita para este horario");
         }
 
+        MedicalService medicalService = medicalServiceRepository.findById(dto.getMedicalServiceId())
+                .orElseThrow(() -> new RuntimeException("Servicio médico no encontrado."));
+
         //Seteamos el estado inicial del pedido (PENDIENTE)
         AppointmentStatus appointmentStatus = appointmentStatusRepository.findByName("PENDING")
                 .orElseThrow(() -> new RuntimeException("Estado PENDING no encontrado"));
@@ -49,7 +57,7 @@ public class AppointmentService {
         //Mapeamos y guardamos
         Appointment appointment = new Appointment();
         appointment.setScheduledAt(dto.getScheduledAt());
-        appointment.setReason(dto.getReason());
+        appointment.setMedicalService(medicalService);
         appointment.setNotes(dto.getNotes());
         appointment.setPetId(dto.getPetId());
         appointment.setStaffId(dto.getStaffId());
@@ -94,8 +102,21 @@ public class AppointmentService {
         appointment.setAppointmentStatus(appointmentStatus);
         Appointment saveAppointment = appointmentRepository.save(appointment);
 
-        //Aqui hay que ver como hacemos el pago en payments
+        //Aquí hay que ver como hacemos el pago en payments
+        //buscamos la mascota para ver quien es el dueño
+        PetResponseDTO pet = petClient.getPetById(saveAppointment.getId());
 
+        PaymentRequestDTO paymentRequest = new PaymentRequestDTO();
+        paymentRequest.setAmount(saveAppointment.getMedicalService().getPrice());
+        paymentRequest.setUserId(pet.getOwnerId());
+        paymentRequest.setAppointmentId(saveAppointment.getId());
+
+        //Enviamos el cobro
+        try {
+            paymentClient.createPayment(paymentRequest);
+        } catch (Exception e) {
+            System.err.println("Error al generar el pago en ms-payments: " + e.getMessage());
+        }
 
         return toDTO(saveAppointment);
     }
@@ -105,13 +126,15 @@ public class AppointmentService {
         AppointmentResponseDTO dto = new AppointmentResponseDTO();
         dto.setId(app.getId());
         dto.setScheduledAt(app.getScheduledAt());
-        dto.setReason(app.getReason());
+        dto.setMedicalServiceName(app.getMedicalService().getName());
+        dto.setPrice(app.getMedicalService().getPrice());
         dto.setNotes(app.getNotes());
         dto.setCreatedAt(app.getCreatedAt());
         dto.setStatusName(app.getAppointmentStatus().getName());
-        dto.setPetId(dto.getPetId());
-        dto.setStaffId(dto.getStaffId());
-        dto.setBranchId(dto.getBranchId());
+
+        dto.setPetId(app.getPetId());
+        dto.setStaffId(app.getStaffId());
+        dto.setBranchId(app.getBranchId());
 
         return dto;
     }
