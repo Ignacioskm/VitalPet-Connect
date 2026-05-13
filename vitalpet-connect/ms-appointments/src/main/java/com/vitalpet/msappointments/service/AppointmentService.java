@@ -8,6 +8,7 @@ import com.vitalpet.msappointments.dto.AppointmentRequestDTO;
 import com.vitalpet.msappointments.dto.AppointmentResponseDTO;
 import com.vitalpet.msappointments.dto.PaymentRequestDTO;
 import com.vitalpet.msappointments.dto.PetResponseDTO;
+import com.vitalpet.msappointments.exception.ResourceNotFoundException;
 import com.vitalpet.msappointments.model.Appointment;
 import com.vitalpet.msappointments.model.AppointmentStatus;
 import com.vitalpet.msappointments.model.MedicalService;
@@ -38,21 +39,21 @@ public class AppointmentService {
 
         //Validamos lo de otros ms.
 
-        if(!petClient.existsById(dto.getPetId())) throw new RuntimeException("Mascota no existe");
-        if(!staffClient.existsById(dto.getStaffId())) throw new RuntimeException("Staff no existe");
-        if(!branchClient.existsById(dto.getBranchId())) throw new RuntimeException("Sucursal no existe");
+        if(!petClient.existsById(dto.getPetId())) throw new ResourceNotFoundException("Mascota no existe");
+        if(!staffClient.existsById(dto.getStaffId())) throw new ResourceNotFoundException("Staff no existe");
+        if(!branchClient.existsById(dto.getBranchId())) throw new ResourceNotFoundException("Sucursal no existe");
 
         //Validamos si el horario está ocupado.
         if(appointmentRepository.existsByStaffIdAndScheduledAt(dto.getStaffId(), dto.getScheduledAt())){
-            throw new RuntimeException("El vet ya tiene una cita para este horario");
+            throw new IllegalArgumentException("El vet ya tiene una cita para este horario");
         }
 
         MedicalService medicalService = medicalServiceRepository.findById(dto.getMedicalServiceId())
-                .orElseThrow(() -> new RuntimeException("Servicio médico no encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Servicio médico no encontrado."));
 
         //Seteamos el estado inicial del pedido (PENDIENTE)
         AppointmentStatus appointmentStatus = appointmentStatusRepository.findByName("PENDING")
-                .orElseThrow(() -> new RuntimeException("Estado PENDING no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Estado PENDING no encontrado"));
 
         //Mapeamos y guardamos
         Appointment appointment = new Appointment();
@@ -81,9 +82,9 @@ public class AppointmentService {
     //Cambiar de estado PEND -> CONFIRMED,CANCELED,COMPLETED.
     //Completed tiene que ser validad con si se pagó o no asi que de momento lo dejaré asi.
     public AppointmentResponseDTO changeStatus(Long id, String newStatus){
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new RuntimeException("Cita no encontrada"));
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Cita no encontrada"));
 
-        AppointmentStatus status = appointmentStatusRepository.findByName(newStatus).orElseThrow(() -> new RuntimeException("Estado" + newStatus + " No Encontrado"));
+        AppointmentStatus status = appointmentStatusRepository.findByName(newStatus).orElseThrow(() -> new ResourceNotFoundException("Estado" + newStatus + " No Encontrado"));
 
         appointment.setAppointmentStatus(status);
 
@@ -94,10 +95,10 @@ public class AppointmentService {
 
 
     public AppointmentResponseDTO completeAppointment(Long id){
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
 
         AppointmentStatus appointmentStatus = appointmentStatusRepository.findByName("COMPLETED")
-                .orElseThrow(()-> new RuntimeException("Estado COMPLETED no encontrado"));
+                .orElseThrow(()-> new ResourceNotFoundException("Estado COMPLETED no encontrado"));
 
         appointment.setAppointmentStatus(appointmentStatus);
         Appointment saveAppointment = appointmentRepository.save(appointment);

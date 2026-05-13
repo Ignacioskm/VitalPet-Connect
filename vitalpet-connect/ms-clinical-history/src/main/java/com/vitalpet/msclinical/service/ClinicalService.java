@@ -6,6 +6,7 @@ import com.vitalpet.msclinical.dto.ClinicalRecordRequestDTO;
 import com.vitalpet.msclinical.dto.ClinicalRecordResponseDTO;
 import com.vitalpet.msclinical.dto.PrescriptionRequestDTO;
 import com.vitalpet.msclinical.dto.PrescriptionResponseDTO;
+import com.vitalpet.msclinical.exception.ResourceNotFoundException;
 import com.vitalpet.msclinical.model.ClinicalRecord;
 import com.vitalpet.msclinical.model.Prescription;
 import com.vitalpet.msclinical.repository.ClinicalRecordRepository;
@@ -36,11 +37,11 @@ public class ClinicalService {
        Boolean staffExists = staffClient.existsById(dto.getStaffId());
 
        if(!petExists){
-           throw new RuntimeException("Error: La mascota con ID " + dto.getPetId() + " no existe");
+           throw new ResourceNotFoundException("Error: La mascota con ID " + dto.getPetId() + " no existe");
        }
 
        if(!staffExists){
-           throw new RuntimeException("Error: El funcionario con ID " + dto.getStaffId() + " no existe");
+           throw new ResourceNotFoundException("Error: El funcionario con ID " + dto.getStaffId() + " no existe");
        }
 
         //Convertimos el DTO principal a entidad.
@@ -67,7 +68,7 @@ public class ClinicalService {
 
     //Buscar por id
     public ClinicalRecordResponseDTO getByID(Long id){
-        ClinicalRecord clinicalRecord = clinicalRepository.findById(id).orElseThrow(() -> new RuntimeException("Clínica no encontrada."));
+        ClinicalRecord clinicalRecord = clinicalRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Clínica no encontrada."));
         return toDTO(clinicalRecord);
     }
 

@@ -3,6 +3,7 @@ package com.vitalpet.msnotifications.service;
 import com.vitalpet.msnotifications.client.UserClient;
 import com.vitalpet.msnotifications.dto.NotificationRequestDTO;
 import com.vitalpet.msnotifications.dto.NotificationResponseDTO;
+import com.vitalpet.msnotifications.exception.ResourceNotFoundException;
 import com.vitalpet.msnotifications.model.Notification;
 import com.vitalpet.msnotifications.model.NotificationType;
 import com.vitalpet.msnotifications.repository.NotificationRepository;
@@ -32,10 +33,10 @@ public class NotificationService {
         String email = userClient.getEmailById(request.getUserId());
 
         if (email == null || email.isBlank()) {
-            throw new RuntimeException("El usuario con ID " + request.getUserId() + " no tiene un email válido.");
+            throw new IllegalArgumentException("El usuario con ID " + request.getUserId() + " no tiene un email válido.");
         }
 
-        NotificationType type = notificationTypeRepository.findByName(request.getType()).orElseThrow(() -> new RuntimeException("Tipo de notificación '" + request.getType() + "' no válido."));
+        NotificationType type = notificationTypeRepository.findByName(request.getType()).orElseThrow(() -> new ResourceNotFoundException("Tipo de notificación '" + request.getType() + "' no válido."));
 
         Notification notification = new Notification();
 
@@ -58,7 +59,7 @@ public class NotificationService {
     }
 
     public NotificationResponseDTO markAsRead(Long id) {
-        Notification notification = notificationRepository.findById(id).orElseThrow(() -> new RuntimeException("Notificación con ID " + id + " no encontrada."));
+        Notification notification = notificationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Notificación con ID " + id + " no encontrada."));
         notification.setReadFlag(true);
         Notification updated = notificationRepository.save(notification);
         return toDTO(updated);

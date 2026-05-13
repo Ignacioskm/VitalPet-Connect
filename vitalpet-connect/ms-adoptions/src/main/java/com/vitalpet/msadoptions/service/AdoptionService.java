@@ -5,6 +5,7 @@ import com.vitalpet.msadoptions.client.UserClient;
 import com.vitalpet.msadoptions.dto.AdoptionRequestDTO;
 import com.vitalpet.msadoptions.dto.AdoptionResponseDTO;
 import com.vitalpet.msadoptions.dto.PetResponseDTO;
+import com.vitalpet.msadoptions.exception.ResourceNotFoundException;
 import com.vitalpet.msadoptions.model.Adoption;
 import com.vitalpet.msadoptions.model.AdoptionStatus;
 import com.vitalpet.msadoptions.repository.AdoptionRepository;
@@ -27,11 +28,11 @@ public class AdoptionService {
     public AdoptionResponseDTO create(AdoptionRequestDTO dto) {
 
         //Validar si existe pet y user
-        if (!petClient.existById(dto.getPetId())) throw new RuntimeException("La mascota no existe.");
-        if (!userClient.existById(dto.getUserId())) throw new RuntimeException("El usuario no existe.");
+        if (!petClient.existById(dto.getPetId())) throw new ResourceNotFoundException("La mascota no existe.");
+        if (!userClient.existById(dto.getUserId())) throw new ResourceNotFoundException("El usuario no existe.");
 
         //Se asigna estado pending
-        AdoptionStatus adoptionStatus = adoptionStatusRepository.findByName("PENDING").orElseThrow(() -> new RuntimeException("Estado PENDING no encontrado."));
+        AdoptionStatus adoptionStatus = adoptionStatusRepository.findByName("PENDING").orElseThrow(() -> new ResourceNotFoundException("Estado PENDING no encontrado."));
 
         Adoption adoption = new Adoption();
         adoption.setNotes(dto.getNotes());
@@ -55,9 +56,9 @@ public class AdoptionService {
 
     //Aprobar adopción
     public AdoptionResponseDTO approve(Long id, Long staffId){
-        Adoption adoption = adoptionRepository.findById(id).orElseThrow((() -> new RuntimeException("Adopción no encontrada")));
+        Adoption adoption = adoptionRepository.findById(id).orElseThrow((() -> new ResourceNotFoundException("Adopción no encontrada")));
 
-        AdoptionStatus approved = adoptionStatusRepository.findByName("APPROVED").orElseThrow(() -> new RuntimeException("Estado APPROVED no existe"));
+        AdoptionStatus approved = adoptionStatusRepository.findByName("APPROVED").orElseThrow(() -> new ResourceNotFoundException("Estado APPROVED no existe"));
 
         adoption.setAdoptionStatus(approved);
         adoption.setStaffId(staffId);
@@ -74,9 +75,9 @@ public class AdoptionService {
     //Rechazar
     public AdoptionResponseDTO reject(Long id, Long staffId){
 
-        Adoption adoption = adoptionRepository.findById(id).orElseThrow(() -> new RuntimeException("Adopción no encontrada"));
+        Adoption adoption = adoptionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Adopción no encontrada"));
 
-        AdoptionStatus rejected = adoptionStatusRepository.findByName("REJECTED").orElseThrow(() -> new RuntimeException("Estado REJECTED no existe"));
+        AdoptionStatus rejected = adoptionStatusRepository.findByName("REJECTED").orElseThrow(() -> new ResourceNotFoundException("Estado REJECTED no existe"));
 
         adoption.setAdoptionStatus(rejected);
         adoption.setStaffId(staffId);
