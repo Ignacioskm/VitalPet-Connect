@@ -22,8 +22,9 @@ public class Appointment {
     @Column(name = "schedule_at", nullable = false)
     private LocalDateTime scheduledAt;
 
-    @Column(columnDefinition = "TEXT")
-    private String reason;
+    @ManyToOne
+    @JoinColumn(name = "medical_service_id", nullable = false)
+    private MedicalService medicalService;
 
     @Column(columnDefinition = "TEXT")
     private String notes;
