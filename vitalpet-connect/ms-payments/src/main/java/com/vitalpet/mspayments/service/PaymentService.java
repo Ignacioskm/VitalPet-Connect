@@ -4,6 +4,7 @@ import com.vitalpet.mspayments.client.NotificationClient;
 import com.vitalpet.mspayments.dto.NotificationRequestDTO;
 import com.vitalpet.mspayments.dto.PaymentRequestDTO;
 import com.vitalpet.mspayments.dto.PaymentResponseDTO;
+import com.vitalpet.mspayments.exception.ResourceNotFoundException;
 import com.vitalpet.mspayments.model.Payment;
 import com.vitalpet.mspayments.model.PaymentMethod;
 import com.vitalpet.mspayments.model.PaymentStatus;
@@ -26,7 +27,7 @@ public class PaymentService {
 
     public PaymentResponseDTO create(PaymentRequestDTO paymentRequestDTO){
         PaymentStatus pending = paymentStatusRepository.findByName("PENDING")
-                .orElseThrow(() -> new RuntimeException("Estado PENDING no Encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Estado PENDING no Encontrado"));
 
         Payment payment = new Payment();
         payment.setAmount(paymentRequestDTO.getAmount());
@@ -40,13 +41,13 @@ public class PaymentService {
     //Lógica de pago
     public PaymentResponseDTO pay(Long id, String methodName){
         Payment payment  = paymentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Pago no encontrado"));
 
         PaymentStatus paidStatus = paymentStatusRepository.findByName("PAID")
-                .orElseThrow(() -> new RuntimeException("Estado PAID no existe"));
+                .orElseThrow(() -> new ResourceNotFoundException("Estado PAID no existe"));
 
         PaymentMethod method = paymentMethodRepository.findByName(methodName)
-                .orElseThrow(() -> new RuntimeException("Método de pago " + methodName + " no existe"));
+                .orElseThrow(() -> new ResourceNotFoundException("Método de pago " + methodName + " no existe"));
 
         payment.setStatus(paidStatus);
         payment.setMethod(method);
@@ -67,10 +68,10 @@ public class PaymentService {
 
     public PaymentResponseDTO refund(Long id){
         Payment payment  = paymentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Pago no encontrado"));
 
         PaymentStatus refunded = paymentStatusRepository.findByName("REFUNDED")
-                .orElseThrow(() -> new RuntimeException("Estado REFUNDED no existe"));
+                .orElseThrow(() -> new ResourceNotFoundException("Estado REFUNDED no existe"));
 
         payment.setStatus(refunded);
         return toDTO(paymentRepository.save(payment));
