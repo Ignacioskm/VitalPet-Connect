@@ -1,7 +1,5 @@
 package com.vitalpet.msnotifications.exception;
 
-import com.vitalpet.mspayments.exception.ErrorResponseDTO;
-import com.vitalpet.mspayments.exception.ResourceNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
