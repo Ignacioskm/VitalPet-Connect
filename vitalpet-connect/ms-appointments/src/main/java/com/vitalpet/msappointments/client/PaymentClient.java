@@ -6,4 +6,5 @@ import org.springframework.cloud.openfeign.FeignClient;
 public interface PaymentClient {
 
     //Necesito que se termine el post de payments.
+
 }

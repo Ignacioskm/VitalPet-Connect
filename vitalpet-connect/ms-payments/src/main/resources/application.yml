@@ -5,7 +5,7 @@ spring:
   application:
     name: ms-payments
   datasource:
-    url: jdbc:mysql://localhost:3306/vitalpet_payments?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3312/vitalpet_payments?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: ${DB_ROOT_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,6 +16,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always #Siempre buscara data.sql
 
 eureka:
   client:
