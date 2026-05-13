@@ -2,6 +2,7 @@ package com.vitalpet.mspets.service;
 
 import com.vitalpet.mspets.dto.PetRequestDTO;
 import com.vitalpet.mspets.dto.PetResponseDTO;
+import com.vitalpet.mspets.exception.ResourceNotFoundException;
 import com.vitalpet.mspets.model.Pet;
 import com.vitalpet.mspets.model.Species;
 import com.vitalpet.mspets.client.UserClient;
@@ -48,7 +49,7 @@ public class PetService {
     }
 
     public PetResponseDTO getById(Long id) {
-        Pet pet = petRepository.findById(id).orElseThrow(() -> new RuntimeException("Mascota no encontrada."));
+        Pet pet = petRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Mascota no encontrada."));
         return toDTO(pet);
     }
 
@@ -56,15 +57,15 @@ public class PetService {
         Boolean userExist = userClient.existById(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(userExist)) {
-            throw new RuntimeException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");
+            throw new ResourceNotFoundException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");
         }
 
-        Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new RuntimeException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
+        Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new ResourceNotFoundException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
 
         Boolean isClient = userClient.isClient(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(isClient)){
-            throw new RuntimeException("Error: El user no es un cliente.");
+            throw new IllegalArgumentException("Error: El user no es un cliente.");
         }
 
         Pet pet = new Pet();
@@ -80,20 +81,20 @@ public class PetService {
     }
 
     public PetResponseDTO update(Long id, PetRequestDTO dto) {
-        Pet existing = petRepository.findById(id).orElseThrow(() -> new RuntimeException("Error: La mascota con ID " + id + " no existe."));
+        Pet existing = petRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Error: La mascota con ID " + id + " no existe."));
 
-        Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new RuntimeException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
+        Species species = speciesRepository.findById(dto.getSpeciesId()).orElseThrow(() -> new ResourceNotFoundException("Error: La especie con ID " + dto.getSpeciesId() + " no existe."));
 
         Boolean userExist = userClient.existById(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(userExist)) {
-            throw new RuntimeException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");
+            throw new ResourceNotFoundException("Error: El dueño con ID " + dto.getOwnerId() + " no existe.");
         }
 
         Boolean isClient = userClient.isClient(dto.getOwnerId());
 
         if (Boolean.FALSE.equals(isClient)){
-            throw new RuntimeException("Error: El user no es un cliente.");
+            throw new IllegalArgumentException("Error: El user no es un cliente.");
         }
 
         existing.setName(dto.getName());
@@ -108,7 +109,7 @@ public class PetService {
     }
 
     public void deactivate(Long id) {
-        Pet pet = petRepository.findById(id).orElseThrow(() -> new RuntimeException("Mascota no encontrada."));
+        Pet pet = petRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Mascota no encontrada."));
 
         pet.setActive(false);
         petRepository.save(pet);
@@ -130,11 +131,15 @@ public class PetService {
     }
 
     public void assignOwner(Long petId,Long userId){
-        Pet pet = petRepository.findById(petId).orElseThrow(() -> new RuntimeException("Mascota no encontrada."));
+        Pet pet = petRepository.findById(petId).orElseThrow(() -> new ResourceNotFoundException("Mascota no encontrada."));
 
         Boolean userExist = userClient.existById(userId);
         if(Boolean.FALSE.equals(userExist)){
-            throw new RuntimeException("Usuario no encontrado");
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        if (Boolean.FALSE.equals(userClient.isClient(userId))) {
+            throw new IllegalArgumentException("El usuario debe tener el rol de cliente para ser dueño de una mascota.");
         }
 
         pet.setOwnerId(userId);
