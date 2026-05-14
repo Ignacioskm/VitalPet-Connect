@@ -61,36 +61,44 @@ Para ejecutar el proyecto en un entorno local, sigue este orden estricto de inic
 
 ## 🛤️ 5. Flujo de Pruebas (El "Camino Feliz")
 
-Para probar el ciclo de vida completo del negocio en Postman o Swagger, ejecuta los siguientes pasos en orden:
+Probar el funcionamiento correcto de todos los MS.
+Dividimos el funcionamiento en 5 fases y una extra para las adopciones, para considerar terminado el proyecto tenemos que cumplir si o si con este flujo más las excepciones.
 
-### Fase 1: Infraestructura y Catálogos Base
-1. **ms-branches:** Crea una Ciudad y luego una Sucursal en esa ciudad.
-2. **ms-staff:** Crea las Especialidades médicas (ej. "Cirujano", "Medicina General").
-3. **ms-pets:** Crea las Especies (ej. "Perro", "Gato").
-4. **ms-appointments:** Crea los Servicios Médicos base con sus precios (ej. "Consulta General: $15.000").
+Fase 1: Infraestructura y Catálogos Base (Los que no dependen de nadie)
 
-### Fase 2: Actores Principales
-5. **ms-users:** Registra dos usuarios (User 1 será un cliente regular, User 2 será para adopciones).
-6. **ms-staff:** Contrata a un veterinario, asígnale el ID de la sucursal y la especialidad creados en la Fase 1.
+    Levanta la infraestructura: Encender eureka-server, esperar a que inicie, y luego levantar ms-auth.
+    ms-branches: Verificar si se crearon las ciudades (City) con data.sql y luego crea una sucursal (Branch) en una ciudad.
+    ms-staff: Verificar si se crearon las especialidades médicas (Specialty), por ejemplo, "Cirujano" o "Medicina General".
+    ms-pets: Verificar si se crearon las espcies (Species) como "Perro" y "Gato".
+    ms-appointments: Verificar si se crearon los servicios médicos (MedicalService) con sus respectivos precios.
 
-### Fase 3: Registro de Pacientes
-7. **ms-pets:** Registra una mascota asignándole el User 1 como dueño (ownerId).
-8. **ms-pets:** Registra una mascota *sin dueño* (ownerId nulo) para las pruebas de adopción.
+Fase 2: Actores Principales (Dependen de la Fase 1)
 
-### Fase 4: Operaciones Médicas
-9. **ms-appointments:** Agenda una cita enviando el ID de la mascota, veterinario, sucursal y servicio médico.
-10. **ms-clinical-history:** Crea una ficha clínica para la mascota asociada a esa cita.
+    ms-users: Registrar al menos dos usuarios. Uno que será el "Cliente/Dueño" y otro para usar en las adopciones.
+    ms-staff: Contratar al primer veterinario. Asignale el ID de la sucursal (Branch) y la especialidad (Specialty) que verificamos en la fase 1. Configurar el horario correspondiente (Schedule).
 
-### Fase 5: Cierre y Facturación
-11. **ms-appointments:** Cambia el estado de la cita a `COMPLETED`. Esto generará automáticamente la deuda en el microservicio de pagos.
-12. **ms-payments:** Consulta los pagos pendientes del User 1.
-13. **ms-payments:** Ejecuta el endpoint de pago (cambia a `PAID`). Esto disparará una alerta a través de `ms-notifications`.
+Fase 3: El Núcleo del Negocio
 
-### Fase Externa: Adopciones
-14. **ms-adoptions:** Crea una solicitud de adopción para la mascota sin dueño asignándosela al User 2.
-15. **ms-adoptions:** Aprueba la solicitud (`APPROVED`). El sistema actualizará automáticamente el dueño en `ms-pets`.
+    ms-pets: Crear una mascota. Se le tendrá que pasar el ID de la especie (Fase 1) y el ID del usuario dueño (Fase 2).
+    ms-pets (Adopción preparativo): Crear una mascota sin dueño (ownerId null) para probar el flujo de adopciones más adelante.
 
----
+Fase 4: Operaciones y Transacciones
+
+    ms-appointments: Crear una cita médica. El JSON deberá tener el ID de la mascota, el ID del veterinario, el ID de la sucursal y el ID del servicio médico. ¡Aquí Feign hará todo su trabajo de validación!
+    ms-clinical-history: Con la mascota en la clínica, el veterinario le crea una ficha clínica (ClinicalRecord) detallando el diagnóstico.
+
+Fase 5: Cierre y Facturación
+
+    ms-appointments: Cambia el estado de la cita a COMPLETED. Aquí la magia ocurre: tu código disparará el evento interno para crear la deuda.
+    ms-payments: Revisa los pagos pendientes del usuario (GET /api/payments/user/{userId}/pending). Deberías ver la deuda que acaba de generar la cita.
+    ms-payments: Ejecuta el método pay (pagar). Esto debe cambiar el estado a PAID y, por debajo, llamar a ms-notifications.
+    ms-notifications: Revisa las notificaciones del usuario para confirmar que llegó el comprobante de pago.
+
+Fase Externa: Adopciones
+
+    ms-adoptions: Pide la lista de mascotas disponibles (/available-pets).
+    ms-adoptions: Crea una solicitud de adopción para la mascota sin dueño que creaste en el paso 9, asignándosela al usuario número 2.
+    ms-adoptions: Aprueba la adopción (estado APPROVED). Esto llamará a ms-pets y le pondrá el dueño a la mascota.
 
 ## 📚 6. Documentación API (Swagger)
 
@@ -98,3 +106,5 @@ Cada microservicio expone su propia documentación interactiva a través de Swag
 
 * `http://localhost:[PUERTO_DEL_MICROSERVICIO]/swagger-ui.html`
 
+**Asignatura:** Desarrollo Fullstack I  
+**Integrantes:** Ignacio Mellado · Martina Molina · Vicente Arredondo  
