@@ -4,10 +4,7 @@ import com.vitalpet.msappointments.client.BranchClient;
 import com.vitalpet.msappointments.client.PaymentClient;
 import com.vitalpet.msappointments.client.PetClient;
 import com.vitalpet.msappointments.client.StaffClient;
-import com.vitalpet.msappointments.dto.AppointmentRequestDTO;
-import com.vitalpet.msappointments.dto.AppointmentResponseDTO;
-import com.vitalpet.msappointments.dto.PaymentRequestDTO;
-import com.vitalpet.msappointments.dto.PetResponseDTO;
+import com.vitalpet.msappointments.dto.*;
 import com.vitalpet.msappointments.exception.ResourceNotFoundException;
 import com.vitalpet.msappointments.model.Appointment;
 import com.vitalpet.msappointments.model.AppointmentStatus;
@@ -38,7 +35,6 @@ public class AppointmentService {
     public AppointmentResponseDTO create(AppointmentRequestDTO dto){
 
         //Validamos lo de otros ms.
-
         if(!petClient.existsById(dto.getPetId())) throw new ResourceNotFoundException("Mascota no existe");
         if(!staffClient.existsById(dto.getStaffId())) throw new ResourceNotFoundException("Staff no existe");
         if(!branchClient.existsById(dto.getBranchId())) throw new ResourceNotFoundException("Sucursal no existe");
@@ -73,6 +69,10 @@ public class AppointmentService {
         return appointmentRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+    public List<MedicalServiceResponseDTO> getAllMedicalServices(){
+        return medicalServiceRepository.findAll().stream().map(this::toMsDTO).toList();
+    }
+
     //Traer appointments por staff
     public List<AppointmentResponseDTO> getByStaff(Long staffId){
         return appointmentRepository.findByStaffIdOrderByScheduledAtAsc(staffId)
@@ -82,9 +82,11 @@ public class AppointmentService {
     //Cambiar de estado PEND -> CONFIRMED,CANCELED,COMPLETED.
     //Completed tiene que ser validad con si se pagó o no asi que de momento lo dejaré asi.
     public AppointmentResponseDTO changeStatus(Long id, String newStatus){
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Cita no encontrada"));
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("Cita no encontrada"));
 
-        AppointmentStatus status = appointmentStatusRepository.findByName(newStatus).orElseThrow(() -> new ResourceNotFoundException("Estado" + newStatus + " No Encontrado"));
+        AppointmentStatus status = appointmentStatusRepository.findByName(newStatus)
+                .orElseThrow(() -> new ResourceNotFoundException("Estado" + newStatus + " No Encontrado"));
 
         appointment.setAppointmentStatus(status);
 
@@ -92,8 +94,6 @@ public class AppointmentService {
     }
 
     //complete (terminar pago)
-
-
     public AppointmentResponseDTO completeAppointment(Long id){
         Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
 
@@ -137,6 +137,14 @@ public class AppointmentService {
         dto.setStaffId(app.getStaffId());
         dto.setBranchId(app.getBranchId());
 
+        return dto;
+    }
+
+    private MedicalServiceResponseDTO toMsDTO(MedicalService medicalService){
+        MedicalServiceResponseDTO dto = new MedicalServiceResponseDTO();
+        dto.setId(medicalService.getId());
+        dto.setName(medicalService.getName());
+        dto.setPrice(medicalService.getPrice());
         return dto;
     }
 }

@@ -2,10 +2,10 @@ package com.vitalpet.msappointments.controller;
 
 import com.vitalpet.msappointments.dto.AppointmentRequestDTO;
 import com.vitalpet.msappointments.dto.AppointmentResponseDTO;
+import com.vitalpet.msappointments.dto.MedicalServiceResponseDTO;
 import com.vitalpet.msappointments.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +15,7 @@ import java.util.List;
 @RequestMapping("/api/appointments")
 public class AppointmentController {
 
-    @Autowired
-    private AppointmentService appointmentService;
+    @Autowired private AppointmentService appointmentService;
 
     @PostMapping
     public ResponseEntity<AppointmentResponseDTO> create(@RequestBody AppointmentRequestDTO dto){
@@ -24,9 +23,10 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AppointmentResponseDTO>> getAll(){
-        return ResponseEntity.ok(appointmentService.getAll());
-    }
+    public ResponseEntity<List<AppointmentResponseDTO>> getAll(){return ResponseEntity.ok(appointmentService.getAll());}
+
+    @GetMapping("/medicals-services")
+    public ResponseEntity<List<MedicalServiceResponseDTO>> getAllMedicals(){return ResponseEntity.ok(appointmentService.getAllMedicalServices());}
 
     @GetMapping("/staff/{staffId}")
     public ResponseEntity<List<AppointmentResponseDTO>> getByStaff(@PathVariable Long staffId){
@@ -43,7 +43,6 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.changeStatus(id,"CANCELLED"));
     }
 
-    //Falta el complete que hay que validar el pago con el ms payments
     @PutMapping("/{id}/complete")
     public ResponseEntity<AppointmentResponseDTO> complete(@PathVariable Long id){
         return ResponseEntity.ok(appointmentService.completeAppointment(id));

@@ -1,10 +1,7 @@
 package com.vitalpet.msstaff.service;
 
 import com.vitalpet.msstaff.client.BranchClient;
-import com.vitalpet.msstaff.dto.ScheduleResponseDTO;
-import com.vitalpet.msstaff.dto.StaffRequestDTO;
-import com.vitalpet.msstaff.dto.StaffResponseDTO;
-import com.vitalpet.msstaff.dto.ScheduleRequestDTO;
+import com.vitalpet.msstaff.dto.*;
 import com.vitalpet.msstaff.exception.ResourceNotFoundException;
 import com.vitalpet.msstaff.model.Specialty;
 import com.vitalpet.msstaff.model.Staff;
@@ -20,18 +17,11 @@ import java.util.stream.Collectors;
 
 @Service
 public class StaffService {
-    @Autowired
-    private StaffRepository staffRepository;
-
-    @Autowired
-    private StaffScheduleRepository staffScheduleRepository;
-
-    @Autowired
-    private StaffSpecialty staffSpecialty;
-
+    @Autowired private StaffRepository staffRepository;
+    @Autowired private StaffScheduleRepository staffScheduleRepository;
+    @Autowired private StaffSpecialty staffSpecialty;
     // Este es el cliente del feign
-    @Autowired
-    private BranchClient branchClient;
+    @Autowired private BranchClient branchClient;
 
 
     //Convertir staff a DTO
@@ -196,5 +186,18 @@ public class StaffService {
     //Verificar si existe
     public boolean staffExistsById(Long id){
         return staffRepository.existsById(id);
+    }
+
+    //ToDTO Specialty
+    public SpecialtyResponseDTO toSpDTO(Specialty specialty){
+        SpecialtyResponseDTO dto = new SpecialtyResponseDTO();
+        dto.setId(specialty.getId());
+        dto.setName(specialty.getName());
+        return dto;
+    }
+
+
+    public List<SpecialtyResponseDTO> getAllSpecialties(){
+        return staffSpecialty.findAll().stream().map(this::toSpDTO).toList();
     }
 }

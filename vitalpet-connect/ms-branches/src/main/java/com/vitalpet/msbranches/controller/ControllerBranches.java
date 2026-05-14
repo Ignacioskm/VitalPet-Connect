@@ -3,6 +3,7 @@ package com.vitalpet.msbranches.controller;
 
 import com.vitalpet.msbranches.dto.BranchesRequestDTO;
 import com.vitalpet.msbranches.dto.BranchesResponseDTO;
+import com.vitalpet.msbranches.dto.CityResponseDTO;
 import com.vitalpet.msbranches.service.ServiceBranches;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,10 @@ public class ControllerBranches {
     private ServiceBranches serviceBranches;
 
     @GetMapping
-    public ResponseEntity<List<BranchesResponseDTO>> getAll() {
-        return ResponseEntity.ok(serviceBranches.getAll());
-    }
+    public ResponseEntity<List<BranchesResponseDTO>> getAll() {return ResponseEntity.ok(serviceBranches.getAll());}
+
+    @GetMapping("/cities")
+    public ResponseEntity<List<CityResponseDTO>> getAllCities() {return ResponseEntity.ok(serviceBranches.getAllCities());}
 
     @GetMapping("/{id}")
     public ResponseEntity<BranchesResponseDTO> getById(@PathVariable Long id) {

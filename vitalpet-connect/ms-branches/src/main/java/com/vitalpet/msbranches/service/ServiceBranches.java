@@ -2,6 +2,7 @@ package com.vitalpet.msbranches.service;
 
 import com.vitalpet.msbranches.dto.BranchesRequestDTO;
 import com.vitalpet.msbranches.dto.BranchesResponseDTO;
+import com.vitalpet.msbranches.dto.CityResponseDTO;
 import com.vitalpet.msbranches.exception.ResourceNotFoundException;
 import com.vitalpet.msbranches.model.Branch;
 import com.vitalpet.msbranches.model.City;
@@ -15,11 +16,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class ServiceBranches {
-    @Autowired
-    private RepositoryBranches repositoryBranches;
 
-    @Autowired
-    private RepositoryCity repositoryCity;
+    @Autowired private RepositoryBranches repositoryBranches;
+    @Autowired private RepositoryCity repositoryCity;
 
     private BranchesResponseDTO toDTO(Branch branch) {
         BranchesResponseDTO dto = new BranchesResponseDTO();
@@ -34,9 +33,19 @@ public class ServiceBranches {
         return dto;
     }
 
+    private CityResponseDTO cityToDTO(City city){
+        CityResponseDTO dto = new CityResponseDTO();
+        dto.setId(city.getId());
+        dto.setName(city.getName());
+        return dto;
+    }
 
     public List<BranchesResponseDTO> getAll() {
         return repositoryBranches.findByActiveTrue().stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    public List<CityResponseDTO> getAllCities(){
+        return repositoryCity.findAll().stream().map(this::cityToDTO).toList();
     }
 
 

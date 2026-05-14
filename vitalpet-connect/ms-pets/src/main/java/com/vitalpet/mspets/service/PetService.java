@@ -2,6 +2,7 @@ package com.vitalpet.mspets.service;
 
 import com.vitalpet.mspets.dto.PetRequestDTO;
 import com.vitalpet.mspets.dto.PetResponseDTO;
+import com.vitalpet.mspets.dto.SpeciesResponseDTO;
 import com.vitalpet.mspets.exception.ResourceNotFoundException;
 import com.vitalpet.mspets.model.Pet;
 import com.vitalpet.mspets.model.Species;
@@ -17,31 +18,18 @@ import java.util.stream.Collectors;
 @Service
 public class PetService {
 
-    @Autowired
-    private PetRepository petRepository;
+    @Autowired private PetRepository petRepository;
 
-    @Autowired
-    private SpeciesRepository speciesRepository;
+    @Autowired private SpeciesRepository speciesRepository;
 
-    @Autowired
-    private UserClient userClient;
-
-    private PetResponseDTO toDTO(Pet pet) {
-        PetResponseDTO dto = new PetResponseDTO();
-        dto.setId(pet.getId());
-        dto.setName(pet.getName());
-        dto.setBreed(pet.getBreed());
-        dto.setBirthDate(pet.getBirthDate());
-        dto.setWeight(pet.getWeight());
-        dto.setActive(pet.getActive());
-        dto.setCreatedAt(pet.getCreatedAt());
-        dto.setSpeciesId(pet.getSpecies().getId());
-        dto.setOwnerId(pet.getOwnerId());
-        return dto;
-    }
+    @Autowired private UserClient userClient;
 
     public List<PetResponseDTO> getAvailablePets() {
         return petRepository.findByOwnerIdIsNull().stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    public List<SpeciesResponseDTO> getAllSpecies(){
+        return speciesRepository.findAll().stream().map(this::toSpDTO).toList();
     }
 
     public List<PetResponseDTO> getAll() {
@@ -144,5 +132,26 @@ public class PetService {
 
         pet.setOwnerId(userId);
         petRepository.save(pet);
+    }
+
+    private PetResponseDTO toDTO(Pet pet) {
+        PetResponseDTO dto = new PetResponseDTO();
+        dto.setId(pet.getId());
+        dto.setName(pet.getName());
+        dto.setBreed(pet.getBreed());
+        dto.setBirthDate(pet.getBirthDate());
+        dto.setWeight(pet.getWeight());
+        dto.setActive(pet.getActive());
+        dto.setCreatedAt(pet.getCreatedAt());
+        dto.setSpeciesId(pet.getSpecies().getId());
+        dto.setOwnerId(pet.getOwnerId());
+        return dto;
+    }
+
+    private SpeciesResponseDTO toSpDTO(Species species){
+        SpeciesResponseDTO dto = new SpeciesResponseDTO();
+        dto.setId(species.getId());
+        dto.setName(species.getName());
+        return dto;
     }
 }
