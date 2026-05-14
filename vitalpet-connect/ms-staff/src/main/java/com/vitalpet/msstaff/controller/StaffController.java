@@ -1,5 +1,6 @@
 package com.vitalpet.msstaff.controller;
 
+import com.vitalpet.msstaff.dto.SpecialtyResponseDTO;
 import com.vitalpet.msstaff.dto.StaffRequestDTO;
 import com.vitalpet.msstaff.dto.StaffResponseDTO;
 import com.vitalpet.msstaff.service.StaffService;
@@ -15,13 +16,15 @@ import java.util.List;
 @RequestMapping("/api/staff")
 public class StaffController {
 
-    @Autowired
-    private StaffService staffService;
+    @Autowired private StaffService staffService;
 
     @GetMapping
     public ResponseEntity<List<StaffResponseDTO>> getAll(){
         return ResponseEntity.ok(staffService.getAll());
     }
+
+    @GetMapping("/specialties")
+    public ResponseEntity<List<SpecialtyResponseDTO>> getAllSpecialties(){return ResponseEntity.ok(staffService.getAllSpecialties());}
 
     @GetMapping("/{id}")
     public ResponseEntity<StaffResponseDTO> getById(@PathVariable Long id){

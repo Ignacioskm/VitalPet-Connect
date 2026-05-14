@@ -3,6 +3,7 @@ package com.vitalpet.mspets.controller;
 
 import com.vitalpet.mspets.dto.PetRequestDTO;
 import com.vitalpet.mspets.dto.PetResponseDTO;
+import com.vitalpet.mspets.dto.SpeciesResponseDTO;
 import com.vitalpet.mspets.service.PetService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +17,15 @@ import java.util.List;
 @RequestMapping("/api/pets")
 public class PetController {
 
-    @Autowired
-    private PetService petService;
+    @Autowired private PetService petService;
 
     @GetMapping
     public ResponseEntity<List<PetResponseDTO>> getAll() {
         return ResponseEntity.ok(petService.getAll());
     }
+
+    @GetMapping("/species")
+    public ResponseEntity<List<SpeciesResponseDTO>> getAllSpecies(){return ResponseEntity.ok(petService.getAllSpecies());}
 
     @GetMapping("/{id}")
     public ResponseEntity<PetResponseDTO> getById(@PathVariable Long id) {
