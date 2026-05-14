@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,6 @@ public class PetRequestDTO {
     @NotNull(message = "Debe especificar el ID de la especie de su mascota.")
     private Long speciesId;
 
-    @NotNull(message = "Debe especificar el ID del dueño. Si no existe, debe registrar uno antes de ingresar su mascota.")
+    @NotBlank(message = "El campo de owner ID no puede estar vacío")
     private Long ownerId;
 }
