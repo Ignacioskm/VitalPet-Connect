@@ -2,6 +2,7 @@ package com.vitalpet.msbranches.service;
 
 import com.vitalpet.msbranches.dto.BranchesRequestDTO;
 import com.vitalpet.msbranches.dto.BranchesResponseDTO;
+import com.vitalpet.msbranches.exception.ResourceNotFoundException;
 import com.vitalpet.msbranches.model.Branch;
 import com.vitalpet.msbranches.model.City;
 import com.vitalpet.msbranches.repository.RepositoryBranches;
@@ -41,7 +42,8 @@ public class ServiceBranches {
 
     //Buscar por ID de sucursal
     public BranchesResponseDTO getById(Long id) {
-        Branch branch = repositoryBranches.findById(id).orElseThrow(() -> new RuntimeException("Sucursal no encontrada."));
+        Branch branch = repositoryBranches.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró ninguna sucursal con el ID: " + id));
         return toDTO(branch);
     }
 
@@ -49,10 +51,10 @@ public class ServiceBranches {
     //Crear Sucursal
     public BranchesResponseDTO create(BranchesRequestDTO dto) {
         if (repositoryBranches.existsByAddress(dto.getAddress())) {
-            throw new RuntimeException("La dirección ya está registrada en una sucursal.");
+            throw new IllegalArgumentException("La dirección ya está registrada en una sucursal.");
         }
 
-        City city = repositoryCity.findByName(dto.getCityName()).orElseThrow(() -> new RuntimeException("Ciudad no encontrada" + dto.getCityName()));
+        City city = repositoryCity.findByName(dto.getCityName()).orElseThrow(() -> new ResourceNotFoundException("Ciudad no encontrada" + dto.getCityName()));
 
         Branch branch = new Branch();
         branch.setName(dto.getName());
@@ -66,9 +68,9 @@ public class ServiceBranches {
 
     //Actualizar sucursal
     public BranchesResponseDTO update(Long id, BranchesRequestDTO dto) {
-        Branch existing = repositoryBranches.findById(id).orElseThrow(() -> new RuntimeException("Sucursal no encontrada."));
+        Branch existing = repositoryBranches.findById(id).orElseThrow(() -> new ResourceNotFoundException("No se encontró ninguna sucursal con el ID: " + id));
 
-        City city = repositoryCity.findByName(dto.getCityName()).orElseThrow(() -> new RuntimeException("Ciudad no encontrada" + dto.getCityName()));
+        City city = repositoryCity.findByName(dto.getCityName()).orElseThrow(() -> new ResourceNotFoundException("Ciudad no encontrada" + dto.getCityName()));
 
         existing.setName(dto.getName());
         existing.setAddress(dto.getAddress());
@@ -81,7 +83,8 @@ public class ServiceBranches {
 
     //Desactivar sucursal
     public void deactivate(Long id) {
-        Branch branch = repositoryBranches.findById(id).orElseThrow(() -> new RuntimeException("Sucursal no encontrada."));
+        Branch branch = repositoryBranches.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró ninguna sucursal con el ID: " + id));
 
         branch.setActive(false);
         repositoryBranches.save(branch);
@@ -92,7 +95,7 @@ public class ServiceBranches {
         boolean cityExists = repositoryCity.existsById(cityId);
 
         if(!cityExists){
-            throw new RuntimeException("La ciudad : " + cityId + " no existe.");
+            throw new ResourceNotFoundException("La ciudad : " + cityId + " no existe.");
         }
 
         return repositoryBranches.findByCityIdAndActiveTrue(cityId).stream().map(this::toDTO).collect(Collectors.toList());

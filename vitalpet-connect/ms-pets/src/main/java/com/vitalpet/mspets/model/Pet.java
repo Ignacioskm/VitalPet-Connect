@@ -45,6 +45,6 @@ public class Pet {
     private Species species;
 
     //Relación con User mediante owner_id
-    @Column(name = "owner_id",nullable = false)
+    @Column(name = "owner_id")
     private Long ownerId;
 }

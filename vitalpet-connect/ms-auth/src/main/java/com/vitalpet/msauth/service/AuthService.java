@@ -4,6 +4,8 @@ import com.vitalpet.msauth.client.UserClient;
 import com.vitalpet.msauth.dto.AuthLoginDTO;
 import com.vitalpet.msauth.dto.UserRequestDTO;
 import com.vitalpet.msauth.dto.UserResponseDTO;
+import com.vitalpet.msauth.exception.InvalidCredentialsException;
+import com.vitalpet.msauth.exception.ResourceNotFoundException;
 import com.vitalpet.msauth.model.Credential;
 import com.vitalpet.msauth.repository.CredentialRepository;
 import com.vitalpet.msauth.security.JwtProvider;
@@ -18,24 +20,17 @@ import java.time.LocalDateTime;
 @Service
 public class AuthService {
 
-    @Autowired
-    private CredentialRepository credentialRepository;
-
-    @Autowired
-    private UserClient userClient;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtProvider jwtProvider;
+    @Autowired private CredentialRepository credentialRepository;
+    @Autowired private UserClient userClient;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private JwtProvider jwtProvider;
 
     @Transactional //Si algo falla se deshace
     public String register(AuthRegisterDTO dto){
 
         //Validamos si existe el email.
         if(credentialRepository.existsByEmail(dto.getEmail())){
-            throw new RuntimeException("El email ya esta registrado");
+            throw new IllegalArgumentException("El email ya esta registrado");
         }
 
         //Armamos el request para ms-users
@@ -65,11 +60,11 @@ public class AuthService {
 
         //Buscamos si el correo existe
         Credential credential = credentialRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new RuntimeException("Credenciales invalidas"));
+                .orElseThrow(() -> new InvalidCredentialsException("Credenciales invalidas"));
 
         //Comparamos contraseñas (ocupamos matches en vez de == porque el hash es distinto cada vez)
         if(!passwordEncoder.matches(dto.getPassword(), credential.getPasswordHash())){
-            throw new RuntimeException("Credenciales Inválidas");
+            throw new InvalidCredentialsException("Credenciales Inválidas");
         }
 
         //Consultamos rol al ms-user

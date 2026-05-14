@@ -5,6 +5,7 @@ import com.vitalpet.msstaff.dto.ScheduleResponseDTO;
 import com.vitalpet.msstaff.dto.StaffRequestDTO;
 import com.vitalpet.msstaff.dto.StaffResponseDTO;
 import com.vitalpet.msstaff.dto.ScheduleRequestDTO;
+import com.vitalpet.msstaff.exception.ResourceNotFoundException;
 import com.vitalpet.msstaff.model.Specialty;
 import com.vitalpet.msstaff.model.Staff;
 import com.vitalpet.msstaff.model.StaffSchedule;
@@ -61,6 +62,12 @@ public class StaffService {
     // Metodo auxiliar para los horarios
     //Le pasamos el dto y el staff para pasarlo a entidad y vincular el horario con el staff en la BD
     private StaffSchedule toEntitySchedule(ScheduleRequestDTO sDto, Staff staff){
+        //validación para validar integridad del horario.
+        if(sDto.getStartTime() != null && sDto.getEndTime() != null
+        && sDto.getStartTime().isAfter(sDto.getEndTime())){
+            throw new IllegalArgumentException("La hora de inicio no puede ser posterior a la hora termino de la jornada para el día: " + sDto.getDayOfWeek());
+        }
+
         StaffSchedule staffSchedule = new StaffSchedule();
         staffSchedule.setDayOfWeek(sDto.getDayOfWeek());
         staffSchedule.setStartTime(sDto.getStartTime());
@@ -69,7 +76,7 @@ public class StaffService {
         return staffSchedule;
     }
 
-    //Metodo auxiliar para convertira la entidad de la BD -> en un DTO response
+    //Metodo auxiliar para convertirá la entidad de la BD -> en un DTO response
     private ScheduleResponseDTO toScheduleDTO(StaffSchedule entity) {
         ScheduleResponseDTO sDto = new ScheduleResponseDTO();
         sDto.setId(entity.getId());
@@ -87,7 +94,8 @@ public class StaffService {
 
 
     public StaffResponseDTO getById(Long id){
-        Staff staff = staffRepository.findById(id).orElseThrow(() -> new RuntimeException("Staff no encontrado"));
+        Staff staff = staffRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró ningún miembro del staff el ID: " + id));
         return toDTO(staff);
     }
 
@@ -98,14 +106,15 @@ public class StaffService {
 
         //Aca ocupamos el metodo de Boolean para verificar ver si branchExist es False
         if(Boolean.FALSE.equals(branchExists)){
-            throw new RuntimeException("Error: La sucursal con ID" + dto.getBranchId() + "no existe");
+            throw new ResourceNotFoundException("Error: La sucursal con ID" + dto.getBranchId() + "no existe");
         }
 
         if(staffRepository.existsByEmail(dto.getEmail())){
-            throw new RuntimeException("El email ya esta registrado");
+            throw new IllegalArgumentException("El email ya esta registrado");
         }
 
-        Specialty specialty = staffSpecialty.findByName(dto.getSpecialtyName()).orElseThrow(() -> new RuntimeException("Specialidad no encontrada " + dto.getSpecialtyName()));
+        Specialty specialty = staffSpecialty.findByName(dto.getSpecialtyName())
+                .orElseThrow(() -> new ResourceNotFoundException("Specialidad no encontrada " + dto.getSpecialtyName()));
 
         Staff staff = new Staff();
         staff.setFirstName(dto.getFirstName());
@@ -139,9 +148,11 @@ public class StaffService {
     }
 
     public StaffResponseDTO update(Long id, StaffRequestDTO dto){
-        Staff existing = staffRepository.findById(id).orElseThrow(() -> new RuntimeException("Staff no encontrado"));
+        Staff existing = staffRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No se encontró ningún miembro del staff el ID: " + id));
 
-        Specialty specialty = staffSpecialty.findByName(dto.getSpecialtyName()).orElseThrow(() -> new RuntimeException("Specialidad no encontrada " + dto.getSpecialtyName()));
+        Specialty specialty = staffSpecialty.findByName(dto.getSpecialtyName())
+                .orElseThrow(() -> new ResourceNotFoundException("Specialidad no encontrada " + dto.getSpecialtyName()));
 
         existing.setFirstName(dto.getFirstName());
         existing.setLastName(dto.getLastName());
@@ -157,7 +168,8 @@ public class StaffService {
     }
 
     public void desactivate(Long id){
-        Staff staff = staffRepository.findById(id).orElseThrow(()-> new RuntimeException("Staff no encontrado"));
+        Staff staff = staffRepository.findById(id)
+                .orElseThrow(()-> new ResourceNotFoundException("No se encontró ningún miembro del staff el ID: " + id));
         staff.setActive(false);
         staffRepository.save(staff);
     }
@@ -166,10 +178,15 @@ public class StaffService {
     public List<StaffResponseDTO> findStaffByBranchId(Long branchId){
 
         //Primero verificamos que la sede existe
-        Boolean branchExists = branchClient.existsById(branchId);
+        Boolean branchExists = false;
+        try {
+            branchExists = branchClient.existsById(branchId);
+        } catch (Exception e){
+            throw new RuntimeException("Error de comunicación al validar la sucursal.");
+        }
 
         if(Boolean.FALSE.equals(branchExists)){
-            throw new RuntimeException("Error: La sucursal con ID" + branchId + "no existe");
+            throw new ResourceNotFoundException("Error: La sucursal con ID" + branchId + "no existe");
         }
 
         //Ahora creamos la lógica para buscar a todos los staff que tengan esa branchId
