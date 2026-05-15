@@ -9,15 +9,16 @@
         <outputRelativeToContentRoot value="true" />
         <module name="ms-clinical-history" />
         <module name="ms-auth" />
-        <module name="ms-branches" />
         <module name="ms-adoptions" />
-        <module name="ms-appointments" />
         <module name="ms-pets" />
+        <module name="eureka-server" />
+        <module name="ms-branches" />
+        <module name="ms-appointments" />
         <module name="ms-staff" />
+        <module name="ms-branch" />
         <module name="api-gateway" />
         <module name="ms-payments" />
         <module name="ms-users" />
-        <module name="eureka-server" />
         <module name="ms-notifications" />
       </profile>
     </annotationProcessing>
@@ -29,6 +30,7 @@
       <module name="ms-adoptions" options="-parameters" />
       <module name="ms-appointments" options="-parameters" />
       <module name="ms-auth" options="-parameters" />
+      <module name="ms-branch" options="-parameters" />
       <module name="ms-branches" options="-parameters" />
       <module name="ms-clinical-history" options="-parameters" />
       <module name="ms-notifications" options="-parameters" />
