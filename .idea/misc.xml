@@ -16,6 +16,18 @@
         <option value="$PROJECT_DIR$/vitalpet-connect/ms-appointments/pom.xml" />
         <option value="$PROJECT_DIR$/vitalpet-connect/ms-notifications/pom.xml" />
         <option value="$PROJECT_DIR$/vitalpet-connect/ms-clinical-history/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-users/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-staff/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-pets/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-payments/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-notifications/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-clinical-history/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-branches/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-auth/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-appointments/pom.xml" />
+        <option value="$PROJECT_DIR$/ms-adoptions/pom.xml" />
+        <option value="$PROJECT_DIR$/infrastructure/eureka-server/pom.xml" />
+        <option value="$PROJECT_DIR$/infrastructure/api-gateway/pom.xml" />
       </list>
     </option>
   </component>
