@@ -17,10 +17,7 @@ import java.util.List;
 @RequestMapping("/api/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-
-    //Como primera etapa no agregare las respuestas negativas.
+    @Autowired private UserService userService;
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAll(){
@@ -64,6 +61,11 @@ public class UserController {
     @GetMapping("/{id}/is-client")
     public ResponseEntity<Boolean> isClient(@PathVariable Long id){
         return ResponseEntity.ok(userService.isClient(id));
+    }
+
+    @GetMapping("/{id}/is-vet")
+    public ResponseEntity<Boolean> isVet(@PathVariable Long id){
+        return ResponseEntity.ok(userService.isVet(id));
     }
 
     //Endpoint para obtener SOLO el email (ms-notifications)

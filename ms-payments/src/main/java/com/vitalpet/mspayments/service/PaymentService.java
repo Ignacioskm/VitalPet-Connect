@@ -61,9 +61,16 @@ public class PaymentService {
         notificationDTO.setType("PAYMENT_CONFIRMED");
         notificationDTO.setMessage("Su pago de: $"+savedPayment.getAmount() + " en VitalPetConnect ha sido procesado de manera exitosa.");
 
-        notificationClient.sendNotification(notificationDTO);
+        // Aca ahcemos trycatch por si notificaciones está off
+        try {
+            notificationClient.sendNotification(notificationDTO);
+        } catch (Exception e) {
+            // Aca no lanzamos excepción porque el pago ya está hecho
+            System.err.println("Advertencia: El pago fue guardado como PAID, pero ms-notifications no pudo enviar el correo de confirmación.");
+        }
 
         return toDTO(savedPayment);
+
     }
 
     public PaymentResponseDTO refund(Long id){
@@ -106,7 +113,7 @@ public class PaymentService {
             dto.setMethodName(null);
         }
 
-        dto.setUserId(dto.getUserId());
+        dto.setUserId(payment.getUserId());
         dto.setAppointmentId(payment.getAppointmentId());
         return dto;
     }

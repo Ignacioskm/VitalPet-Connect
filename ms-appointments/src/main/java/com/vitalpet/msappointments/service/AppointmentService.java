@@ -95,7 +95,12 @@ public class AppointmentService {
 
     //complete (terminar pago)
     public AppointmentResponseDTO completeAppointment(Long id){
-        Appointment appointment = appointmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cita no encontrada"));
+
+        if (!appointment.getAppointmentStatus().getName().equals("CONFIRMED")) {
+            throw new IllegalStateException("Error de negocio: Solo se pueden completar y cobrar citas que estén previamente en estado CONFIRMED.");
+        }
 
         AppointmentStatus appointmentStatus = appointmentStatusRepository.findByName("COMPLETED")
                 .orElseThrow(()-> new ResourceNotFoundException("Estado COMPLETED no encontrado"));
@@ -105,7 +110,12 @@ public class AppointmentService {
 
         //Aquí hay que ver como hacemos el pago en payments
         //buscamos la mascota para ver quien es el dueño
-        PetResponseDTO pet = petClient.getPetById(saveAppointment.getPetId());
+        PetResponseDTO pet;
+        try {
+            pet = petClient.getPetById(saveAppointment.getPetId());
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error: No se pudo obtener la información de la mascota desde ms-pets.");
+        }
 
         PaymentRequestDTO paymentRequest = new PaymentRequestDTO();
         paymentRequest.setAmount(saveAppointment.getMedicalService().getPrice());
