@@ -32,13 +32,10 @@ public class GlobalExceptionHandler {
     //Segunda excepción: 400 -> Faltan datos obligatorios (Los del jakarta)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidationExceptions(MethodArgumentNotValidException ex){
-        //Aquí guardamos los errores
-        List<String> errors = new ArrayList<>();
-
-        //Recorremos los errores y los guardamos.
-        for(FieldError fieldError : ex.getBindingResult().getFieldErrors()){
-            errors.add(fieldError.getDefaultMessage());
-        }
+        //Aquí guardamos los errores del jakarta
+        List<String> errors = ex.getBindingResult().getFieldErrors().stream()
+                .map(err -> err.getField() + ": "+ err.getDefaultMessage())
+                .toList();
 
         //Construimos el error
         ErrorResponseDTO error = new ErrorResponseDTO();
@@ -89,6 +86,19 @@ public class GlobalExceptionHandler {
         error.setDetails(null);
 
         return new ResponseEntity<>(error,HttpStatus.BAD_REQUEST);
+    }
+
+    //Sexta excepción: 400 -> Error de estado (Máquina de estados / Flujo incorrecto)
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponseDTO> handleIllegalState(IllegalStateException ex){
+        ErrorResponseDTO error = new ErrorResponseDTO();
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setError("Invalid State Transition");
+        error.setMessage(ex.getMessage());
+        error.setDetails(null);
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
     //Error genérico por si no atrapamos ningún otro.

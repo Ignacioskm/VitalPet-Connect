@@ -44,6 +44,10 @@ public class Staff {
     @Column (name="branch_id", nullable = false)
     private Long branchId;
 
+    //Referencia lógica al microservicios de usuarios.
+    @Column(name = "user_id",nullable = false,unique = true)
+    private Long userId;
+
     @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StaffSchedule> schedules = new ArrayList<>();
 

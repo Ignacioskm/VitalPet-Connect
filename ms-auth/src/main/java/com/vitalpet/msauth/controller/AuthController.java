@@ -3,6 +3,7 @@ package com.vitalpet.msauth.controller;
 import com.vitalpet.msauth.dto.AuthLoginDTO;
 import com.vitalpet.msauth.dto.AuthRegisterDTO;
 import com.vitalpet.msauth.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,12 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody AuthRegisterDTO dto){
+    public ResponseEntity<String> register(@Valid @RequestBody AuthRegisterDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(dto));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthLoginDTO dto){
+    public ResponseEntity<String> login(@Valid @RequestBody AuthLoginDTO dto){
         return ResponseEntity.ok(authService.login(dto));
     }
 

@@ -40,9 +40,11 @@ public class StaffRequestDTO {
     @NotNull(message = "Debe ingresar el ID de la sucursal donde trabaja.")
     private Long branchId;
 
+    @NotNull(message = "El ID del usuario es obligatorio.")
+    private Long userId;
+
     @NotBlank(message = "Debe especificar el nombre de la especialidad.")
     private String specialtyName;
 
     private List<ScheduleRequestDTO> schedules; // <-- Horarios de nuestro Staff
-
 }

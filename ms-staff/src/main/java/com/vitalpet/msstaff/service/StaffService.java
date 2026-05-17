@@ -1,6 +1,7 @@
 package com.vitalpet.msstaff.service;
 
 import com.vitalpet.msstaff.client.BranchClient;
+import com.vitalpet.msstaff.client.UserClient;
 import com.vitalpet.msstaff.dto.*;
 import com.vitalpet.msstaff.exception.ResourceNotFoundException;
 import com.vitalpet.msstaff.model.Specialty;
@@ -20,68 +21,14 @@ public class StaffService {
     @Autowired private StaffRepository staffRepository;
     @Autowired private StaffScheduleRepository staffScheduleRepository;
     @Autowired private StaffSpecialty staffSpecialty;
-    // Este es el cliente del feign
     @Autowired private BranchClient branchClient;
-
-
-    //Convertir staff a DTO
-
-    private StaffResponseDTO toDTO(Staff staff){
-        StaffResponseDTO dto = new StaffResponseDTO();
-
-        dto.setId(staff.getId());
-        dto.setFirstName(staff.getFirstName());
-        dto.setLastName(staff.getLastName());
-        dto.setEmail(staff.getEmail());
-        dto.setPhoneNumber(staff.getPhoneNumber());
-        dto.setActive(staff.getActive());
-        dto.setHireDate(staff.getHireDate());
-        dto.setCreatedAt(staff.getCreatedAt());
-        dto.setBranchId(staff.getBranchId());
-        //En vez de pasar los horarios directos mapeamos el DTO de salida
-        if (staff.getSchedules() != null) {
-            List<ScheduleResponseDTO> scheduleDTOs = staff.getSchedules().stream()
-                    .map(this::toScheduleDTO) //
-                    .collect(Collectors.toList());
-            dto.setSchedules(scheduleDTOs);
-        }
-        dto.setSpecialtyName(staff.getSpecialty().getName());
-        return dto;
-    }
-
-    // Metodo auxiliar para los horarios
-    //Le pasamos el dto y el staff para pasarlo a entidad y vincular el horario con el staff en la BD
-    private StaffSchedule toEntitySchedule(ScheduleRequestDTO sDto, Staff staff){
-        //validación para validar integridad del horario.
-        if(sDto.getStartTime() != null && sDto.getEndTime() != null
-        && sDto.getStartTime().isAfter(sDto.getEndTime())){
-            throw new IllegalArgumentException("La hora de inicio no puede ser posterior a la hora termino de la jornada para el día: " + sDto.getDayOfWeek());
-        }
-
-        StaffSchedule staffSchedule = new StaffSchedule();
-        staffSchedule.setDayOfWeek(sDto.getDayOfWeek());
-        staffSchedule.setStartTime(sDto.getStartTime());
-        staffSchedule.setEndTime(sDto.getEndTime());
-        staffSchedule.setStaff(staff); // <- Aca se vincula el horario con el staff en la BD
-        return staffSchedule;
-    }
-
-    //Metodo auxiliar para convertirá la entidad de la BD -> en un DTO response
-    private ScheduleResponseDTO toScheduleDTO(StaffSchedule entity) {
-        ScheduleResponseDTO sDto = new ScheduleResponseDTO();
-        sDto.setId(entity.getId());
-        sDto.setDayOfWeek(entity.getDayOfWeek());
-        sDto.setStartTime(entity.getStartTime());
-        sDto.setEndTime(entity.getEndTime());
-        return sDto;
-    }
-
+    @Autowired
+    private UserClient userClient;
 
     //Traer todos los staff y mapearlos a StaffResponseDTO
     public List<StaffResponseDTO> getAll(){
         return staffRepository.findByActiveTrue().stream().map(this::toDTO).collect(Collectors.toList());
     }
-
 
     public StaffResponseDTO getById(Long id){
         Staff staff = staffRepository.findById(id)
@@ -92,12 +39,38 @@ public class StaffService {
     public StaffResponseDTO create(StaffRequestDTO dto){
         // Primero validamos al otro microservicio antes de buscar nada más.
         //Con esto nos aseguramos que el id de la sucursal exista y si no mató nomas.
-        Boolean branchExists = branchClient.existsById(dto.getBranchId());
+        Boolean branchExists = false;
+        try{
+            branchExists = branchClient.existsById(dto.getBranchId());
+        } catch (Exception e){
+            throw new RuntimeException("Error de comunicación al validar la sucursal en ms-branchs");
+        }
 
         //Aca ocupamos el metodo de Boolean para verificar ver si branchExist es False
         if(Boolean.FALSE.equals(branchExists)){
             throw new ResourceNotFoundException("Error: La sucursal con ID" + dto.getBranchId() + "no existe");
         }
+
+        Boolean userExists = false;
+        Boolean isVet = false;
+
+        try {
+            userExists = userClient.existById(dto.getUserId());
+            if(Boolean.TRUE.equals(userExists)){
+                isVet = userClient.isVet(dto.getUserId());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error de comunicacion al validar el usuario en ms users ");
+        }
+
+        if(Boolean.FALSE.equals(userExists)){
+            throw new ResourceNotFoundException("Error: El usuario con ID " + dto.getUserId() + " no existe.");
+        }
+        if(Boolean.FALSE.equals(isVet)){
+            throw new IllegalArgumentException("Error: El usuario debe tener el rol VET para ser registrado como personal médico.");
+        }
+
+
 
         if(staffRepository.existsByEmail(dto.getEmail())){
             throw new IllegalArgumentException("El email ya esta registrado");
@@ -113,6 +86,7 @@ public class StaffService {
         staff.setPhoneNumber(dto.getPhoneNumber());
         staff.setHireDate(dto.getHireDate());
         staff.setBranchId(dto.getBranchId());
+        staff.setUserId(dto.getUserId());
         staff.setSpecialty(specialty);
 
         //Aca verificamos que los horarios estén en el JSON del cliente
@@ -133,7 +107,6 @@ public class StaffService {
             staff.setSchedules(scheduleEntities);
         }
 
-
         return toDTO(staffRepository.save(staff));
     }
 
@@ -146,7 +119,7 @@ public class StaffService {
 
         existing.setFirstName(dto.getFirstName());
         existing.setLastName(dto.getLastName());
-        //No se agrega email! ya que es nuestro atributo inmutable lo que nos permite no tener duplicados
+        //No se agrega email ni el userId! ya que es nuestro atributo inmutable lo que nos permite no tener duplicados
         existing.setPhoneNumber(dto.getPhoneNumber());
         existing.setHireDate(dto.getHireDate());
 
@@ -199,5 +172,57 @@ public class StaffService {
 
     public List<SpecialtyResponseDTO> getAllSpecialties(){
         return staffSpecialty.findAll().stream().map(this::toSpDTO).toList();
+    }
+
+    //Metodos AUX
+    //Convertir staff a DTO
+    private StaffResponseDTO toDTO(Staff staff){
+        StaffResponseDTO dto = new StaffResponseDTO();
+
+        dto.setId(staff.getId());
+        dto.setFirstName(staff.getFirstName());
+        dto.setLastName(staff.getLastName());
+        dto.setEmail(staff.getEmail());
+        dto.setPhoneNumber(staff.getPhoneNumber());
+        dto.setActive(staff.getActive());
+        dto.setHireDate(staff.getHireDate());
+        dto.setCreatedAt(staff.getCreatedAt());
+        dto.setBranchId(staff.getBranchId());
+        dto.setUserId(staff.getUserId());
+        //En vez de pasar los horarios directos mapeamos el DTO de salida
+        if (staff.getSchedules() != null) {
+            List<ScheduleResponseDTO> scheduleDTOs = staff.getSchedules().stream()
+                    .map(this::toScheduleDTO) //
+                    .collect(Collectors.toList());
+            dto.setSchedules(scheduleDTOs);
+        }
+        dto.setSpecialtyName(staff.getSpecialty().getName());
+        return dto;
+    }
+
+    //Le pasamos el dto y el staff para pasarlo a entidad y vincular el horario con el staff en la BD
+    private StaffSchedule toEntitySchedule(ScheduleRequestDTO sDto, Staff staff){
+        //validación para validar integridad del horario.
+        if(sDto.getStartTime() != null && sDto.getEndTime() != null
+                && sDto.getStartTime().isAfter(sDto.getEndTime())){
+            throw new IllegalArgumentException("La hora de inicio no puede ser posterior a la hora termino de la jornada para el día: " + sDto.getDayOfWeek());
+        }
+
+        StaffSchedule staffSchedule = new StaffSchedule();
+        staffSchedule.setDayOfWeek(sDto.getDayOfWeek());
+        staffSchedule.setStartTime(sDto.getStartTime());
+        staffSchedule.setEndTime(sDto.getEndTime());
+        staffSchedule.setStaff(staff); // <- Aca se vincula el horario con el staff en la BD
+        return staffSchedule;
+    }
+
+    //Metodo auxiliar para convertirá la entidad de la BD -> en un DTO response
+    private ScheduleResponseDTO toScheduleDTO(StaffSchedule entity) {
+        ScheduleResponseDTO sDto = new ScheduleResponseDTO();
+        sDto.setId(entity.getId());
+        sDto.setDayOfWeek(entity.getDayOfWeek());
+        sDto.setStartTime(entity.getStartTime());
+        sDto.setEndTime(entity.getEndTime());
+        return sDto;
     }
 }

@@ -25,6 +25,7 @@ public class StaffResponseDTO {
 
     //Validar branchID con webclient
     private Long branchId;
+    private Long userId;
 
     private List<ScheduleResponseDTO> schedules;
     private String specialtyName;
