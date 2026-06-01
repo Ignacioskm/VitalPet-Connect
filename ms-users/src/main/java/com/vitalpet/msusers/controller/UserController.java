@@ -1,5 +1,6 @@
 package com.vitalpet.msusers.controller;
 
+import com.vitalpet.msusers.assembler.UserModelAssembler;
 import com.vitalpet.msusers.dto.UserRequestDTO;
 import com.vitalpet.msusers.dto.UserResponseDTO;
 import com.vitalpet.msusers.model.User;
@@ -7,6 +8,7 @@ import com.vitalpet.msusers.service.UserService;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,7 @@ import java.util.List;
 public class UserController {
 
     @Autowired private UserService userService;
+    @Autowired private UserModelAssembler userAssembler;
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAll(){
@@ -25,8 +28,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id){
-        return ResponseEntity.ok(userService.getById(id));
+    public ResponseEntity<EntityModel<UserResponseDTO>> getById(@PathVariable Long id){
+        UserResponseDTO userDTO = userService.getById(id);
+        return ResponseEntity.ok(userAssembler.toModel(userDTO));
     }
 
     @PostMapping

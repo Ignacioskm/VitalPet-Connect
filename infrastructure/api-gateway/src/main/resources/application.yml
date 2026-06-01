@@ -11,71 +11,51 @@ spring:
           uri: lb://ms-auth
           predicates:
             - Path=/api/auth/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
 
         - id: ms-users
           uri: lb://ms-users
           predicates:
-            - Path=/api/users/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
+            - Path=/api/user/**
 
         - id: ms-pets
           uri: lb://ms-pets
           predicates:
             - Path=/api/pets/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
 
         - id: ms-clinical-history
           uri: lb://ms-clinical-history
           predicates:
             - Path=/api/clinical/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
 
         - id: ms-appointments
           uri: lb://ms-appointments
           predicates:
             - Path=/api/appointments/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
 
         - id: ms-staff
           uri: lb://ms-staff
           predicates:
             - Path=/api/staff/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
 
         - id: ms-payments
           uri: lb://ms-payments
           predicates:
             - Path=/api/payments/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
 
         - id: ms-adoptions
           uri: lb://ms-adoptions
           predicates:
             - Path=/api/adoptions/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
 
         - id: ms-notifications
           uri: lb://ms-notifications
           predicates:
             - Path=/api/notifications/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
 
         - id: ms-branches
           uri: lb://ms-branches
           predicates:
             - Path=/api/branches/**
-          filters:
-            - StripPrefix=2 # Filtro para la url y evitar el Fetch Error
     globalcors:
       cors-configurations:
         '[/**]':
@@ -90,7 +70,7 @@ springdoc:
       - name: "01. Auth"
         url: /api/auth/v3/api-docs
       - name: "02. Users"
-        url: /api/users/v3/api-docs
+        url: /api/user/v3/api-docs
       - name: "03. Pets"
         url: /api/pets/v3/api-docs
       - name: "04. Clinical History"

@@ -1,5 +1,6 @@
 server:
   port: 8082
+  forward-headers-strategy: framework #Esto es para que swagger no se salte la api-gateway CREO
 
 spring:
   application:
@@ -33,4 +34,4 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
   api-docs:
-    path: /v3/api-docs
+    path: /api/user/v3/api-docs

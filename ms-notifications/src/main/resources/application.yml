@@ -1,5 +1,6 @@
 server:
   port: 8089
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -32,4 +33,4 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
   api-docs:
-    path: /v3/api-docs
+    path: /api/notifications/v3/api-docs
