@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AppointmentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-appointments</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msappointments.service</a> &gt; <span class="el_source">AppointmentService.java</span></div><h1>AppointmentService.java</h1><pre class="source lang-java linenums">package com.vitalpet.msappointments.service;
+
+import com.vitalpet.msappointments.client.BranchClient;
+import com.vitalpet.msappointments.client.PaymentClient;
+import com.vitalpet.msappointments.client.PetClient;
+import com.vitalpet.msappointments.client.StaffClient;
+import com.vitalpet.msappointments.dto.*;
+import com.vitalpet.msappointments.exception.ResourceNotFoundException;
+import com.vitalpet.msappointments.model.Appointment;
+import com.vitalpet.msappointments.model.AppointmentStatus;
+import com.vitalpet.msappointments.model.MedicalService;
+import com.vitalpet.msappointments.repository.AppointmentRepository;
+import com.vitalpet.msappointments.repository.AppointmentStatusRepository;
+import com.vitalpet.msappointments.repository.MedicalServiceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L22">public class AppointmentService {</span>
+
+    //Repositorios
+    @Autowired private AppointmentRepository appointmentRepository;
+    @Autowired private AppointmentStatusRepository appointmentStatusRepository;
+    @Autowired private MedicalServiceRepository medicalServiceRepository;
+
+    //Clientes OpenFeign
+    @Autowired private PetClient petClient;
+    @Autowired private StaffClient staffClient;
+    @Autowired private BranchClient branchClient;
+    @Autowired private PaymentClient paymentClient;
+
+    public AppointmentResponseDTO create(AppointmentRequestDTO dto){
+
+        //Validamos lo de otros ms.
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if(!petClient.existsById(dto.getPetId())) throw new ResourceNotFoundException(&quot;Mascota no existe&quot;);</span>
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        if(!staffClient.existsById(dto.getStaffId())) throw new ResourceNotFoundException(&quot;Staff no existe&quot;);</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if(!branchClient.existsById(dto.getBranchId())) throw new ResourceNotFoundException(&quot;Sucursal no existe&quot;);</span>
+
+        //Validamos si el horario está ocupado.
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if(appointmentRepository.existsByStaffIdAndScheduledAt(dto.getStaffId(), dto.getScheduledAt())){</span>
+<span class="fc" id="L44">            throw new IllegalArgumentException(&quot;El vet ya tiene una cita para este horario&quot;);</span>
+        }
+
+<span class="fc" id="L47">        MedicalService medicalService = medicalServiceRepository.findById(dto.getMedicalServiceId())</span>
+<span class="pc" id="L48">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Servicio médico no encontrado.&quot;));</span>
+
+        //Seteamos el estado inicial del pedido (PENDIENTE)
+<span class="fc" id="L51">        AppointmentStatus appointmentStatus = appointmentStatusRepository.findByName(&quot;PENDING&quot;)</span>
+<span class="pc" id="L52">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Estado PENDING no encontrado&quot;));</span>
+
+        //Mapeamos y guardamos
+<span class="fc" id="L55">        Appointment appointment = new Appointment();</span>
+<span class="fc" id="L56">        appointment.setScheduledAt(dto.getScheduledAt());</span>
+<span class="fc" id="L57">        appointment.setMedicalService(medicalService);</span>
+<span class="fc" id="L58">        appointment.setNotes(dto.getNotes());</span>
+<span class="fc" id="L59">        appointment.setPetId(dto.getPetId());</span>
+<span class="fc" id="L60">        appointment.setStaffId(dto.getStaffId());</span>
+<span class="fc" id="L61">        appointment.setBranchId(dto.getBranchId());</span>
+<span class="fc" id="L62">        appointment.setAppointmentStatus(appointmentStatus); //Le seteamos el estado PENDIENTE que es nuestro estado por defecto</span>
+
+<span class="fc" id="L64">        return toDTO(appointmentRepository.save(appointment));</span>
+    }
+
+    //Traer todos los appointments
+    public List&lt;AppointmentResponseDTO&gt; getAll(){
+<span class="fc" id="L69">        return appointmentRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+    public List&lt;MedicalServiceResponseDTO&gt; getAllMedicalServices(){
+<span class="fc" id="L73">        return medicalServiceRepository.findAll().stream().map(this::toMsDTO).toList();</span>
+    }
+
+    //Traer appointments por staff
+    public List&lt;AppointmentResponseDTO&gt; getByStaff(Long staffId){
+<span class="fc" id="L78">        return appointmentRepository.findByStaffIdOrderByScheduledAtAsc(staffId)</span>
+<span class="fc" id="L79">                .stream().map(this::toDTO).toList();</span>
+    }
+
+    //Cambiar de estado PEND -&gt; CONFIRMED,CANCELED,COMPLETED.
+    //Completed tiene que ser validad con si se pagó o no asi que de momento lo dejaré asi.
+    public AppointmentResponseDTO changeStatus(Long id, String newStatus){
+<span class="fc" id="L85">        Appointment appointment = appointmentRepository.findById(id)</span>
+<span class="pc" id="L86">                .orElseThrow(()-&gt; new ResourceNotFoundException(&quot;Cita no encontrada&quot;));</span>
+
+<span class="fc" id="L88">        AppointmentStatus status = appointmentStatusRepository.findByName(newStatus)</span>
+<span class="pc" id="L89">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Estado&quot; + newStatus + &quot; No Encontrado&quot;));</span>
+
+<span class="fc" id="L91">        appointment.setAppointmentStatus(status);</span>
+
+<span class="fc" id="L93">        return toDTO(appointmentRepository.save(appointment));</span>
+    }
+
+    //complete (terminar pago)
+    public AppointmentResponseDTO completeAppointment(Long id){
+<span class="fc" id="L98">        Appointment appointment = appointmentRepository.findById(id)</span>
+<span class="pc" id="L99">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Cita no encontrada&quot;));</span>
+
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (!appointment.getAppointmentStatus().getName().equals(&quot;CONFIRMED&quot;)) {</span>
+<span class="fc" id="L102">            throw new IllegalStateException(&quot;Error de negocio: Solo se pueden completar y cobrar citas que estén previamente en estado CONFIRMED.&quot;);</span>
+        }
+
+<span class="fc" id="L105">        AppointmentStatus appointmentStatus = appointmentStatusRepository.findByName(&quot;COMPLETED&quot;)</span>
+<span class="pc" id="L106">                .orElseThrow(()-&gt; new ResourceNotFoundException(&quot;Estado COMPLETED no encontrado&quot;));</span>
+
+<span class="fc" id="L108">        appointment.setAppointmentStatus(appointmentStatus);</span>
+<span class="fc" id="L109">        Appointment saveAppointment = appointmentRepository.save(appointment);</span>
+
+        //Aquí hay que ver como hacemos el pago en payments
+        //buscamos la mascota para ver quien es el dueño
+        PetResponseDTO pet;
+        try {
+<span class="fc" id="L115">            pet = petClient.getPetById(saveAppointment.getPetId());</span>
+<span class="fc" id="L116">        } catch (Exception e) {</span>
+<span class="fc" id="L117">            throw new ResourceNotFoundException(&quot;Error: No se pudo obtener la información de la mascota desde ms-pets.&quot;);</span>
+<span class="fc" id="L118">        }</span>
+
+<span class="fc" id="L120">        PaymentRequestDTO paymentRequest = new PaymentRequestDTO();</span>
+<span class="fc" id="L121">        paymentRequest.setAmount(saveAppointment.getMedicalService().getPrice());</span>
+<span class="fc" id="L122">        paymentRequest.setUserId(pet.getOwnerId());</span>
+<span class="fc" id="L123">        paymentRequest.setAppointmentId(saveAppointment.getId());</span>
+
+        //Enviamos el cobro
+        try {
+<span class="fc" id="L127">            paymentClient.createPayment(paymentRequest);</span>
+<span class="fc" id="L128">        } catch (Exception e) {</span>
+<span class="fc" id="L129">            System.err.println(&quot;Error al generar el pago en ms-payments: &quot; + e.getMessage());</span>
+<span class="fc" id="L130">        }</span>
+
+<span class="fc" id="L132">        return toDTO(saveAppointment);</span>
+    }
+
+    //MAPEADOR
+    private AppointmentResponseDTO toDTO(Appointment app){
+<span class="fc" id="L137">        AppointmentResponseDTO dto = new AppointmentResponseDTO();</span>
+<span class="fc" id="L138">        dto.setId(app.getId());</span>
+<span class="fc" id="L139">        dto.setScheduledAt(app.getScheduledAt());</span>
+<span class="fc" id="L140">        dto.setMedicalServiceName(app.getMedicalService().getName());</span>
+<span class="fc" id="L141">        dto.setPrice(app.getMedicalService().getPrice());</span>
+<span class="fc" id="L142">        dto.setNotes(app.getNotes());</span>
+<span class="fc" id="L143">        dto.setCreatedAt(app.getCreatedAt());</span>
+<span class="fc" id="L144">        dto.setStatusName(app.getAppointmentStatus().getName());</span>
+
+<span class="fc" id="L146">        dto.setPetId(app.getPetId());</span>
+<span class="fc" id="L147">        dto.setStaffId(app.getStaffId());</span>
+<span class="fc" id="L148">        dto.setBranchId(app.getBranchId());</span>
+
+<span class="fc" id="L150">        return dto;</span>
+    }
+
+    private MedicalServiceResponseDTO toMsDTO(MedicalService medicalService){
+<span class="fc" id="L154">        MedicalServiceResponseDTO dto = new MedicalServiceResponseDTO();</span>
+<span class="fc" id="L155">        dto.setId(medicalService.getId());</span>
+<span class="fc" id="L156">        dto.setName(medicalService.getName());</span>
+<span class="fc" id="L157">        dto.setPrice(medicalService.getPrice());</span>
+<span class="fc" id="L158">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AppointmentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-appointments</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msappointments.controller</a> &gt; <span class="el_source">AppointmentController.java</span></div><h1>AppointmentController.java</h1><pre class="source lang-java linenums">package com.vitalpet.msappointments.controller;
+
+import com.vitalpet.msappointments.dto.AppointmentRequestDTO;
+import com.vitalpet.msappointments.dto.AppointmentResponseDTO;
+import com.vitalpet.msappointments.dto.MedicalServiceResponseDTO;
+import com.vitalpet.msappointments.service.AppointmentService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/appointments&quot;)
+<span class="nc" id="L17">public class AppointmentController {</span>
+
+    @Autowired private AppointmentService appointmentService;
+
+    @PostMapping
+    public ResponseEntity&lt;AppointmentResponseDTO&gt; create(@Valid @RequestBody AppointmentRequestDTO dto){
+<span class="nc" id="L23">        return ResponseEntity.status(HttpStatus.CREATED).body(appointmentService.create(dto));</span>
+    }
+
+    @GetMapping
+<span class="nc" id="L27">    public ResponseEntity&lt;List&lt;AppointmentResponseDTO&gt;&gt; getAll(){return ResponseEntity.ok(appointmentService.getAll());}</span>
+
+    @GetMapping(&quot;/medicals-services&quot;)
+<span class="nc" id="L30">    public ResponseEntity&lt;List&lt;MedicalServiceResponseDTO&gt;&gt; getAllMedicals(){return ResponseEntity.ok(appointmentService.getAllMedicalServices());}</span>
+
+    @GetMapping(&quot;/staff/{staffId}&quot;)
+    public ResponseEntity&lt;List&lt;AppointmentResponseDTO&gt;&gt; getByStaff(@PathVariable Long staffId){
+<span class="nc" id="L34">        return ResponseEntity.ok(appointmentService.getByStaff(staffId));</span>
+    }
+
+    @PutMapping(&quot;/{id}/confirm&quot;)
+    public ResponseEntity&lt;AppointmentResponseDTO&gt; confirm(@PathVariable Long id){
+<span class="nc" id="L39">        return ResponseEntity.ok(appointmentService.changeStatus(id,&quot;CONFIRMED&quot;));</span>
+    }
+
+    @PutMapping(&quot;/{id}/cancel&quot;)
+    public ResponseEntity&lt;AppointmentResponseDTO&gt; cancel(@PathVariable Long id){
+<span class="nc" id="L44">        return ResponseEntity.ok(appointmentService.changeStatus(id,&quot;CANCELLED&quot;));</span>
+    }
+
+    @PutMapping(&quot;/{id}/complete&quot;)
+    public ResponseEntity&lt;AppointmentResponseDTO&gt; complete(@PathVariable Long id){
+<span class="nc" id="L49">        return ResponseEntity.ok(appointmentService.completeAppointment(id));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

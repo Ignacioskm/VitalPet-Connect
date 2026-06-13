@@ -1,0 +1,6 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+ms-pets,com.vitalpet.mspets.service,PetService,40,358,4,12,3,70,8,20,4,16
+ms-pets,com.vitalpet.mspets,MsPetsApplication,8,0,0,0,3,0,2,0,2,0
+ms-pets,com.vitalpet.mspets.controller,PetController,67,0,0,0,13,0,11,0,11,0
+ms-pets,com.vitalpet.mspets.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+ms-pets,com.vitalpet.mspets.exception,GlobalExceptionHandler,175,0,0,0,46,0,8,0,8,0

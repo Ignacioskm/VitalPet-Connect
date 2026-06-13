@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServiceBranches.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-branch</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msbranches.service</a> &gt; <span class="el_source">ServiceBranches.java</span></div><h1>ServiceBranches.java</h1><pre class="source lang-java linenums">package com.vitalpet.msbranches.service;
+
+import com.vitalpet.msbranches.dto.BranchesRequestDTO;
+import com.vitalpet.msbranches.dto.BranchesResponseDTO;
+import com.vitalpet.msbranches.dto.CityResponseDTO;
+import com.vitalpet.msbranches.exception.ResourceNotFoundException;
+import com.vitalpet.msbranches.model.Branch;
+import com.vitalpet.msbranches.model.City;
+import com.vitalpet.msbranches.repository.RepositoryBranches;
+import com.vitalpet.msbranches.repository.RepositoryCity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L18">public class ServiceBranches {</span>
+
+    @Autowired private RepositoryBranches repositoryBranches;
+    @Autowired private RepositoryCity repositoryCity;
+
+    private BranchesResponseDTO toDTO(Branch branch) {
+<span class="fc" id="L24">        BranchesResponseDTO dto = new BranchesResponseDTO();</span>
+<span class="fc" id="L25">        dto.setId(branch.getId());</span>
+<span class="fc" id="L26">        dto.setName(branch.getName());</span>
+<span class="fc" id="L27">        dto.setAddress(branch.getAddress());</span>
+<span class="fc" id="L28">        dto.setPhone(branch.getPhone());</span>
+<span class="fc" id="L29">        dto.setEmail(branch.getEmail());</span>
+<span class="fc" id="L30">        dto.setActive(branch.getActive());</span>
+<span class="fc" id="L31">        dto.setCreatedAt(branch.getCreatedAt());</span>
+<span class="fc" id="L32">        dto.setCityName(branch.getCity().getName());</span>
+<span class="fc" id="L33">        return dto;</span>
+    }
+
+    private CityResponseDTO cityToDTO(City city){
+<span class="fc" id="L37">        CityResponseDTO dto = new CityResponseDTO();</span>
+<span class="fc" id="L38">        dto.setId(city.getId());</span>
+<span class="fc" id="L39">        dto.setName(city.getName());</span>
+<span class="fc" id="L40">        return dto;</span>
+    }
+
+    public List&lt;BranchesResponseDTO&gt; getAll() {
+<span class="fc" id="L44">        return repositoryBranches.findByActiveTrue().stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+    public List&lt;CityResponseDTO&gt; getAllCities(){
+<span class="fc" id="L48">        return repositoryCity.findAll().stream().map(this::cityToDTO).toList();</span>
+    }
+
+
+    //Buscar por ID de sucursal
+    public BranchesResponseDTO getById(Long id) {
+<span class="fc" id="L54">        Branch branch = repositoryBranches.findById(id)</span>
+<span class="fc" id="L55">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;No se encontró ninguna sucursal con el ID: &quot; + id));</span>
+<span class="fc" id="L56">        return toDTO(branch);</span>
+    }
+
+
+    //Crear Sucursal
+    public BranchesResponseDTO create(BranchesRequestDTO dto) {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (repositoryBranches.existsByAddress(dto.getAddress())) {</span>
+<span class="fc" id="L63">            throw new IllegalArgumentException(&quot;La dirección ya está registrada en una sucursal.&quot;);</span>
+        }
+
+<span class="fc" id="L66">        City city = repositoryCity.findByName(dto.getCityName()).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Ciudad no encontrada&quot; + dto.getCityName()));</span>
+
+<span class="fc" id="L68">        Branch branch = new Branch();</span>
+<span class="fc" id="L69">        branch.setName(dto.getName());</span>
+<span class="fc" id="L70">        branch.setAddress(dto.getAddress());</span>
+<span class="fc" id="L71">        branch.setPhone(dto.getPhone());</span>
+<span class="fc" id="L72">        branch.setEmail(dto.getEmail());</span>
+<span class="fc" id="L73">        branch.setCity(city);</span>
+
+<span class="fc" id="L75">        return toDTO(repositoryBranches.save(branch));</span>
+    }
+
+    //Actualizar sucursal
+    public BranchesResponseDTO update(Long id, BranchesRequestDTO dto) {
+<span class="fc" id="L80">        Branch existing = repositoryBranches.findById(id).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;No se encontró ninguna sucursal con el ID: &quot; + id));</span>
+
+<span class="pc" id="L82">        City city = repositoryCity.findByName(dto.getCityName()).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Ciudad no encontrada&quot; + dto.getCityName()));</span>
+
+<span class="fc" id="L84">        existing.setName(dto.getName());</span>
+<span class="fc" id="L85">        existing.setAddress(dto.getAddress());</span>
+<span class="fc" id="L86">        existing.setPhone(dto.getPhone());</span>
+<span class="fc" id="L87">        existing.setEmail(dto.getEmail());</span>
+<span class="fc" id="L88">        existing.setCity(city);</span>
+
+<span class="fc" id="L90">        return toDTO(repositoryBranches.save(existing));</span>
+    }
+
+    //Desactivar sucursal
+    public void deactivate(Long id) {
+<span class="fc" id="L95">        Branch branch = repositoryBranches.findById(id)</span>
+<span class="pc" id="L96">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;No se encontró ninguna sucursal con el ID: &quot; + id));</span>
+
+<span class="fc" id="L98">        branch.setActive(false);</span>
+<span class="fc" id="L99">        repositoryBranches.save(branch);</span>
+<span class="fc" id="L100">    }</span>
+
+    //Traer sucursales por ciudad
+    public List&lt;BranchesResponseDTO&gt; findByCityId(Long cityId){
+<span class="fc" id="L104">        boolean cityExists = repositoryCity.existsById(cityId);</span>
+
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        if(!cityExists){</span>
+<span class="fc" id="L107">            throw new ResourceNotFoundException(&quot;La ciudad : &quot; + cityId + &quot; no existe.&quot;);</span>
+        }
+
+<span class="fc" id="L110">        return repositoryBranches.findByCityIdAndActiveTrue(cityId).stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+    //Verificar si la sucursal existe
+    public boolean branchExistsById(Long id){
+<span class="fc" id="L115">        return repositoryBranches.existsById(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-auth</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msauth.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">package com.vitalpet.msauth.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+<span class="nc" id="L15">public class SecurityConfig {</span>
+
+    //Aca vamos a definir como se protegerá la API REST
+
+    //Por lo que entendí bean, lo que hace es que una vez creado el objeto se lo da a spring para que lo administre él.
+    @Bean
+    public PasswordEncoder passwordEncoder(){ //Interfaz de spring security tiene marches y encode
+<span class="nc" id="L22">        return new BCryptPasswordEncoder(); //Impl de algoritmo BCrypt</span>
+    }
+
+
+    //Aca va a ir el filtro que queremos para nuestro entorno
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+<span class="nc" id="L29">        http</span>
+<span class="nc" id="L30">                .csrf(AbstractHttpConfigurer::disable) //Desactivamos CSRF porque no usamos sesiones de navegador tradicionales</span>
+                //STATELESS declara la sesión sin estado, significa que el servidor no recordará quien eres entre una petición y otra.
+<span class="nc" id="L32">                .sessionManagement(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</span>
+<span class="nc" id="L33">                .authorizeHttpRequests(auth -&gt; auth</span>
+<span class="nc" id="L34">                        .requestMatchers(&quot;/api/auth/register&quot;,&quot;/api/auth/login&quot;,&quot;/error&quot;,&quot;/v3/api-docs/**&quot;, &quot;/swagger-ui/**&quot;, &quot;/swagger-ui.html&quot;,&quot;/api/auth/v3/api-docs/**&quot;).permitAll() //la dejamos como rutas publicas</span>
+<span class="nc" id="L35">                        .anyRequest().authenticated() //el resto requiere toquen si o si</span>
+                );
+<span class="nc" id="L37">        return http.build();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

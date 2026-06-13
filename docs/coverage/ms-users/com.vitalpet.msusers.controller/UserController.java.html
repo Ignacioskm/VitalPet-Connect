@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-users</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msusers.controller</a> &gt; <span class="el_source">UserController.java</span></div><h1>UserController.java</h1><pre class="source lang-java linenums">package com.vitalpet.msusers.controller;
+
+import com.vitalpet.msusers.assembler.UserModelAssembler;
+import com.vitalpet.msusers.dto.UserRequestDTO;
+import com.vitalpet.msusers.dto.UserResponseDTO;
+import com.vitalpet.msusers.model.User;
+import com.vitalpet.msusers.service.UserService;
+import jakarta.validation.Valid;
+import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/user&quot;)
+<span class="nc" id="L20">public class UserController {</span>
+
+    @Autowired private UserService userService;
+    @Autowired private UserModelAssembler userAssembler;
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;UserResponseDTO&gt;&gt; getAll(){
+<span class="nc" id="L27">        return ResponseEntity.ok(userService.getAll());</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;EntityModel&lt;UserResponseDTO&gt;&gt; getById(@PathVariable Long id){
+<span class="nc" id="L32">        UserResponseDTO userDTO = userService.getById(id);</span>
+<span class="nc" id="L33">        return ResponseEntity.ok(userAssembler.toModel(userDTO));</span>
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;UserResponseDTO&gt; create(@Valid @RequestBody UserRequestDTO dto){
+<span class="nc" id="L38">        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;UserResponseDTO&gt; update(@PathVariable Long id, @Valid @RequestBody UserRequestDTO dto){
+<span class="nc" id="L43">        return ResponseEntity.ok(userService.update(id,dto));</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable Long id){
+<span class="nc" id="L48">        userService.deactivate(id);</span>
+<span class="nc" id="L49">        return ResponseEntity.noContent().build();</span>
+    }
+
+    //listar usuarios por rol
+    @GetMapping(&quot;/role/{roleName}&quot;)
+    public ResponseEntity&lt;List&lt;UserResponseDTO&gt;&gt; getUsersByRol(@PathVariable String roleName){
+<span class="nc" id="L55">        return ResponseEntity.ok(userService.getUsersByRol(roleName));</span>
+    }
+
+    //Verificar si el usuario existe (Este endpoint sera consumido por otros MS)
+    @GetMapping(&quot;/{id}/exists&quot;)
+    public ResponseEntity&lt;Boolean&gt; userExistsById(@PathVariable Long id){
+<span class="nc" id="L61">        return ResponseEntity.ok(userService.UserExistsById(id));</span>
+    }
+
+    //Verificar con id si user es cliente
+    @GetMapping(&quot;/{id}/is-client&quot;)
+    public ResponseEntity&lt;Boolean&gt; isClient(@PathVariable Long id){
+<span class="nc" id="L67">        return ResponseEntity.ok(userService.isClient(id));</span>
+    }
+
+    @GetMapping(&quot;/{id}/is-vet&quot;)
+    public ResponseEntity&lt;Boolean&gt; isVet(@PathVariable Long id){
+<span class="nc" id="L72">        return ResponseEntity.ok(userService.isVet(id));</span>
+    }
+
+    //Endpoint para obtener SOLO el email (ms-notifications)
+    @GetMapping(&quot;/{id}/email&quot;)
+    public ResponseEntity&lt;String&gt; getEmailById(@PathVariable Long id){
+<span class="nc" id="L78">        return ResponseEntity.ok(userService.getEmailById(id));</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdoptionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-adoptions</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msadoptions.service</a> &gt; <span class="el_source">AdoptionService.java</span></div><h1>AdoptionService.java</h1><pre class="source lang-java linenums">package com.vitalpet.msadoptions.service;
+
+import com.vitalpet.msadoptions.client.PetClient;
+import com.vitalpet.msadoptions.client.UserClient;
+import com.vitalpet.msadoptions.dto.AdoptionRequestDTO;
+import com.vitalpet.msadoptions.dto.AdoptionResponseDTO;
+import com.vitalpet.msadoptions.dto.PetResponseDTO;
+import com.vitalpet.msadoptions.exception.ResourceNotFoundException;
+import com.vitalpet.msadoptions.model.Adoption;
+import com.vitalpet.msadoptions.model.AdoptionStatus;
+import com.vitalpet.msadoptions.repository.AdoptionRepository;
+import com.vitalpet.msadoptions.repository.AdoptionStatusRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+<span class="fc" id="L20">public class AdoptionService {</span>
+
+    @Autowired  private AdoptionRepository adoptionRepository;
+    @Autowired  private AdoptionStatusRepository adoptionStatusRepository;
+    @Autowired  private PetClient petClient;
+    @Autowired  private UserClient userClient;
+
+
+    public AdoptionResponseDTO create(AdoptionRequestDTO dto) {
+
+        //Validamos que la mascota exista y esté disponible pa adoptar
+        PetResponseDTO pet;
+        try {
+<span class="fc" id="L33">            pet = petClient.getPetById(dto.getPetId());</span>
+<span class="fc" id="L34">        } catch (Exception e){</span>
+<span class="fc" id="L35">            throw new ResourceNotFoundException(&quot;La mascota con ID &quot;+ dto.getPetId());</span>
+<span class="fc" id="L36">        }</span>
+
+<span class="fc bfc" id="L38" title="All 2 branches covered.">        if(pet.getOwnerId() != null){</span>
+<span class="fc" id="L39">            throw new IllegalArgumentException(&quot;Error: La mascota &quot; + pet.getName() + &quot; ya tiene un dueño asignado&quot;);</span>
+        }
+
+        //Validamos usuario y rol , que exista y que sea client
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (!userClient.existById(dto.getUserId())) {</span>
+<span class="fc" id="L44">            throw new ResourceNotFoundException(&quot;El usuario con ID &quot; + dto.getUserId() + &quot; no existe.&quot;);</span>
+        }
+
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (Boolean.FALSE.equals(userClient.isClient(dto.getUserId()))) {</span>
+<span class="fc" id="L48">            throw new IllegalArgumentException(&quot;Error: Solo los usuarios registrados como CLIENT pueden realizar solicitudes de adopción.&quot;);</span>
+        }
+
+        //Se asigna estado pending
+<span class="fc" id="L52">        AdoptionStatus adoptionStatus = adoptionStatusRepository.findByName(&quot;PENDING&quot;)</span>
+<span class="pc" id="L53">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Estado PENDING no encontrado.&quot;));</span>
+
+<span class="fc" id="L55">        Adoption adoption = new Adoption();</span>
+<span class="fc" id="L56">        adoption.setNotes(dto.getNotes());</span>
+<span class="fc" id="L57">        adoption.setAdoptionStatus(adoptionStatus); //Se setea ya que por defecto el estado es PENDING</span>
+<span class="fc" id="L58">        adoption.setPetId(dto.getPetId());</span>
+<span class="fc" id="L59">        adoption.setUserId(dto.getUserId());</span>
+<span class="fc" id="L60">        adoption.setRequestDate(LocalDateTime.now());</span>
+
+<span class="fc" id="L62">        return toDTO(adoptionRepository.save(adoption));</span>
+    }
+
+    //Trae todas las adopciones
+    public List&lt;AdoptionResponseDTO&gt; getAll() {
+<span class="fc" id="L67">        return adoptionRepository.findAll().stream().map(this::toDTO).toList();</span>
+    }
+
+    //Trae mascotas disponibles para adopción
+    public List&lt;PetResponseDTO&gt; getAvailablePets() {
+<span class="fc" id="L72">        return  petClient.getAvailablePets();</span>
+    }
+
+    //Aprobar adopción
+    public AdoptionResponseDTO approve(Long id, Long staffId){
+<span class="pc" id="L77">        Adoption adoption = adoptionRepository.findById(id).orElseThrow((() -&gt; new ResourceNotFoundException(&quot;Adopción no encontrada&quot;)));</span>
+
+<span class="fc" id="L79">        AdoptionStatus approved = adoptionStatusRepository.findByName(&quot;APPROVED&quot;).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Estado APPROVED no existe&quot;));</span>
+
+<span class="fc" id="L81">        adoption.setAdoptionStatus(approved);</span>
+<span class="fc" id="L82">        adoption.setStaffId(staffId);</span>
+<span class="fc" id="L83">        adoption.setResolveDate(LocalDateTime.now());</span>
+
+<span class="fc" id="L85">        Adoption saved = adoptionRepository.save(adoption);</span>
+
+<span class="fc" id="L87">        petClient.updateOwner(adoption.getPetId(),adoption.getUserId());</span>
+
+<span class="fc" id="L89">        return toDTO(saved);</span>
+
+    }
+
+    //Rechazar
+    public AdoptionResponseDTO reject(Long id, Long staffId){
+
+<span class="pc" id="L96">        Adoption adoption = adoptionRepository.findById(id).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Adopción no encontrada&quot;));</span>
+
+<span class="pc" id="L98">        AdoptionStatus rejected = adoptionStatusRepository.findByName(&quot;REJECTED&quot;).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Estado REJECTED no existe&quot;));</span>
+
+<span class="fc" id="L100">        adoption.setAdoptionStatus(rejected);</span>
+<span class="fc" id="L101">        adoption.setStaffId(staffId);</span>
+<span class="fc" id="L102">        adoption.setResolveDate(LocalDateTime.now());</span>
+
+<span class="fc" id="L104">        return toDTO(adoptionRepository.save(adoption));</span>
+    }
+
+
+
+
+    public AdoptionResponseDTO toDTO(Adoption adop) {
+<span class="fc" id="L111">        AdoptionResponseDTO dto = new AdoptionResponseDTO();</span>
+<span class="fc" id="L112">        dto.setId(adop.getId());</span>
+<span class="fc" id="L113">        dto.setRequestDate(adop.getRequestDate());</span>
+<span class="fc" id="L114">        dto.setResolveDate(adop.getResolveDate());</span>
+<span class="fc" id="L115">        dto.setNotes(adop.getNotes());</span>
+<span class="fc" id="L116">        dto.setCreatedAt(adop.getCreatedAt());</span>
+<span class="fc" id="L117">        dto.setPetId(adop.getPetId());</span>
+<span class="fc" id="L118">        dto.setUserId(adop.getUserId());</span>
+<span class="fc" id="L119">        dto.setStaffId(adop.getStaffId());</span>
+
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (adop.getAdoptionStatus() != null) {</span>
+<span class="fc" id="L122">            dto.setStatusName(adop.getAdoptionStatus().getName()); //Agrega el nombre del status para mostrarlo en JSON</span>
+        }
+<span class="fc" id="L124">        return dto;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

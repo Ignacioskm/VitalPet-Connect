@@ -1,0 +1,6 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+ms-clinical-history,com.vitalpet.msclinical.exception,GlobalExceptionHandler,175,0,0,0,46,0,8,0,8,0
+ms-clinical-history,com.vitalpet.msclinical.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+ms-clinical-history,com.vitalpet.msclinical.service,ClinicalService,0,230,1,9,0,53,1,14,0,10
+ms-clinical-history,com.vitalpet.msclinical.controller,ClinicalController,23,0,0,0,4,0,4,0,4,0
+ms-clinical-history,com.vitalpet.msclinical,MsClinicalApplication,8,0,0,0,3,0,2,0,2,0

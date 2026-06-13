@@ -1,0 +1,6 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+ms-branch,com.vitalpet.msbranches.controller,ControllerBranches,54,0,0,0,10,0,9,0,9,0
+ms-branch,com.vitalpet.msbranches.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+ms-branch,com.vitalpet.msbranches.exception,GlobalExceptionHandler,175,0,0,0,46,0,8,0,8,0
+ms-branch,com.vitalpet.msbranches,MsBranchesApplication,8,0,0,0,3,0,2,0,2,0
+ms-branch,com.vitalpet.msbranches.service,ServiceBranches,13,256,0,4,0,48,2,16,2,14

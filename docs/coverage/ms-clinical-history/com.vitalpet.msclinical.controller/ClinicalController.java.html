@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClinicalController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-clinical-history</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msclinical.controller</a> &gt; <span class="el_source">ClinicalController.java</span></div><h1>ClinicalController.java</h1><pre class="source lang-java linenums">package com.vitalpet.msclinical.controller;
+
+import com.vitalpet.msclinical.dto.ClinicalRecordRequestDTO;
+import com.vitalpet.msclinical.dto.ClinicalRecordResponseDTO;
+import com.vitalpet.msclinical.service.ClinicalService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/clinical&quot;)
+<span class="nc" id="L16">public class ClinicalController {</span>
+
+    @Autowired private ClinicalService clinicalService;
+
+    //Crear nueva ficha con receta
+    @PostMapping
+    public ResponseEntity&lt;ClinicalRecordResponseDTO&gt; createRecord(@Valid @RequestBody ClinicalRecordRequestDTO dto){
+<span class="nc" id="L23">        return ResponseEntity.status(HttpStatus.CREATED).body(clinicalService.create(dto));</span>
+    }
+
+    //Obtener el historial completo de una mascota
+    @GetMapping(&quot;/pet/{petId}&quot;)
+    public ResponseEntity&lt;List&lt;ClinicalRecordResponseDTO&gt;&gt; getPetHistory(@PathVariable Long petId){
+<span class="nc" id="L29">        return ResponseEntity.ok(clinicalService.getHistoryByPet(petId));</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;ClinicalRecordResponseDTO&gt; getById(@PathVariable Long id){
+<span class="nc" id="L34">        return ResponseEntity.ok(clinicalService.getByID(id));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
