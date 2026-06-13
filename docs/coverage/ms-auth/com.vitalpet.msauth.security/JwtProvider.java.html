@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-auth</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msauth.security</a> &gt; <span class="el_source">JwtProvider.java</span></div><h1>JwtProvider.java</h1><pre class="source lang-java linenums">package com.vitalpet.msauth.security;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.util.Date;
+
+@Component
+<span class="nc" id="L11">public class JwtProvider {</span>
+
+    //Esta es la clase que fabrica emite y valida los tokens.
+
+    //Esto en produccion se supone que va en el aplication.yml
+    @Value(&quot;${jwt.secret}&quot;)
+    private String secretKey;
+
+    public String generateToken(Long userId, String role){
+<span class="nc" id="L20">        return Jwts.builder()</span>
+<span class="nc" id="L21">                .setSubject(userId.toString()) //El dueño del token</span>
+<span class="nc" id="L22">                .claim(&quot;role&quot;,role) //guardamos el rol como dato extra (payload)</span>
+<span class="nc" id="L23">                .setIssuedAt(new Date())</span>
+<span class="nc" id="L24">                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) //Expira en 10 horas</span>
+<span class="nc" id="L25">                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes()) //firmamos con la secret key &quot;matemáticamente&quot;</span>
+<span class="nc" id="L26">                .compact();</span>
+    }
+
+    public boolean validateToken(String token){
+        try{
+<span class="nc" id="L31">            Jwts.parserBuilder()</span>
+<span class="nc" id="L32">                    .setSigningKey(secretKey.getBytes())</span>
+<span class="nc" id="L33">                    .build()</span>
+<span class="nc" id="L34">                    .parseClaimsJws(token);</span>
+<span class="nc" id="L35">            return true;</span>
+<span class="nc" id="L36">        } catch (Exception e){</span>
+<span class="nc" id="L37">            return false; //Si ya está expirado, cae aca.</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

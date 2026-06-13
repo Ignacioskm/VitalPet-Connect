@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-payments</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.mspayments.controller</a> &gt; <span class="el_source">PaymentController.java</span></div><h1>PaymentController.java</h1><pre class="source lang-java linenums">package com.vitalpet.mspayments.controller;
+
+import com.vitalpet.mspayments.dto.PaymentRequestDTO;
+import com.vitalpet.mspayments.dto.PaymentResponseDTO;
+import com.vitalpet.mspayments.service.PaymentService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/payments&quot;)
+<span class="nc" id="L16">public class PaymentController {</span>
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;PaymentResponseDTO&gt;&gt; getAll(){
+<span class="nc" id="L23">        return ResponseEntity.ok(paymentService.getAll());</span>
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;PaymentResponseDTO&gt; create(@Valid @RequestBody PaymentRequestDTO paymentRequestDTO){
+<span class="nc" id="L28">        return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.create(paymentRequestDTO));</span>
+    }
+
+    //Traer pendientes
+    @GetMapping(&quot;/user/{userId}/pending&quot;)
+    public ResponseEntity&lt;List&lt;PaymentResponseDTO&gt;&gt; getPendingUser(@PathVariable Long userId){
+<span class="nc" id="L34">        return ResponseEntity.ok(paymentService.getPendingByUser(userId));</span>
+    }
+
+    @PutMapping(&quot;/{id}/pay&quot;)
+    public ResponseEntity&lt;PaymentResponseDTO&gt; pay(@PathVariable Long id, @RequestParam String method){
+<span class="nc" id="L39">        return ResponseEntity.ok(paymentService.pay(id,method));</span>
+    }
+
+    @PutMapping(&quot;/{id}/refund&quot;)
+    public ResponseEntity&lt;PaymentResponseDTO&gt; refund(@PathVariable Long id) {
+<span class="nc" id="L44">        return ResponseEntity.ok(paymentService.refund(id));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

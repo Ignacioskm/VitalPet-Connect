@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-auth</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msauth.service</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.vitalpet.msauth.service;
+
+import com.vitalpet.msauth.client.UserClient;
+import com.vitalpet.msauth.dto.AuthLoginDTO;
+import com.vitalpet.msauth.dto.UserRequestDTO;
+import com.vitalpet.msauth.dto.UserResponseDTO;
+import com.vitalpet.msauth.exception.InvalidCredentialsException;
+import com.vitalpet.msauth.exception.ResourceNotFoundException;
+import com.vitalpet.msauth.model.Credential;
+import com.vitalpet.msauth.repository.CredentialRepository;
+import com.vitalpet.msauth.security.JwtProvider;
+import com.vitalpet.msauth.dto.AuthRegisterDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+@Service
+<span class="fc" id="L21">public class AuthService {</span>
+
+    @Autowired private CredentialRepository credentialRepository;
+    @Autowired private UserClient userClient;
+    @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private JwtProvider jwtProvider;
+
+    @Transactional //Si algo falla se deshace
+    public String register(AuthRegisterDTO dto){
+
+        //Validamos si existe el email.
+<span class="fc bfc" id="L32" title="All 2 branches covered.">        if(credentialRepository.existsByEmail(dto.getEmail())){</span>
+<span class="fc" id="L33">            throw new IllegalArgumentException(&quot;El email ya esta registrado&quot;);</span>
+        }
+
+        //Armamos el request para ms-users
+<span class="fc" id="L37">        UserRequestDTO userRequestDTO = new UserRequestDTO();</span>
+<span class="fc" id="L38">        userRequestDTO.setFirstName(dto.getFirstName());</span>
+<span class="fc" id="L39">        userRequestDTO.setLastName(dto.getLastName());</span>
+<span class="fc" id="L40">        userRequestDTO.setEmail(dto.getEmail());</span>
+<span class="fc" id="L41">        userRequestDTO.setPhoneNumber(dto.getPhoneNumber());</span>
+<span class="fc" id="L42">        userRequestDTO.setAddress(dto.getAddress());</span>
+<span class="fc" id="L43">        userRequestDTO.setRoleName(dto.getRoleName());</span>
+
+        // Llamamos a ms user para crear el perfil
+<span class="fc" id="L46">        UserResponseDTO userResponse = userClient.createUser(userRequestDTO);</span>
+
+        // Creamos y guardamos la credencial segura
+<span class="fc" id="L49">        Credential credential = new Credential();</span>
+<span class="fc" id="L50">        credential.setUserId(userResponse.getId());</span>
+<span class="fc" id="L51">        credential.setEmail(dto.getEmail());</span>
+<span class="fc" id="L52">        credential.setPasswordHash(passwordEncoder.encode(dto.getPassword()));</span>
+
+<span class="fc" id="L54">        credentialRepository.save(credential);</span>
+
+<span class="fc" id="L56">        return &quot;Usuario registrado exitosamente&quot;;</span>
+    }
+
+    public String login(AuthLoginDTO dto){
+
+        //Buscamos si el correo existe
+<span class="fc" id="L62">        Credential credential = credentialRepository.findByEmail(dto.getEmail())</span>
+<span class="fc" id="L63">                .orElseThrow(() -&gt; new InvalidCredentialsException(&quot;Credenciales invalidas&quot;));</span>
+
+        //Comparamos contraseñas (ocupamos matches en vez de == porque el hash es distinto cada vez)
+<span class="fc bfc" id="L66" title="All 2 branches covered.">        if(!passwordEncoder.matches(dto.getPassword(), credential.getPasswordHash())){</span>
+<span class="fc" id="L67">            throw new InvalidCredentialsException(&quot;Credenciales Inválidas&quot;);</span>
+        }
+
+        //Consultamos rol al ms-user
+<span class="fc" id="L71">        UserResponseDTO userProfile = userClient.getUserById(credential.getId());</span>
+
+        //Actualizamos el login netamente pa trazabilidad
+<span class="fc" id="L74">        credential.setLastLogin(LocalDateTime.now());</span>
+<span class="fc" id="L75">        credentialRepository.save(credential);</span>
+
+        //RETORNAMOS el token fabricado
+<span class="fc" id="L78">        return jwtProvider.generateToken(credential.getUserId(),userProfile.getRoleName());</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StaffController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-staff</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msstaff.controller</a> &gt; <span class="el_source">StaffController.java</span></div><h1>StaffController.java</h1><pre class="source lang-java linenums">package com.vitalpet.msstaff.controller;
+
+import com.vitalpet.msstaff.dto.SpecialtyResponseDTO;
+import com.vitalpet.msstaff.dto.StaffRequestDTO;
+import com.vitalpet.msstaff.dto.StaffResponseDTO;
+import com.vitalpet.msstaff.service.StaffService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/staff&quot;)
+<span class="nc" id="L17">public class StaffController {</span>
+
+    @Autowired private StaffService staffService;
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;StaffResponseDTO&gt;&gt; getAll(){
+<span class="nc" id="L23">        return ResponseEntity.ok(staffService.getAll());</span>
+    }
+
+    @GetMapping(&quot;/specialties&quot;)
+<span class="nc" id="L27">    public ResponseEntity&lt;List&lt;SpecialtyResponseDTO&gt;&gt; getAllSpecialties(){return ResponseEntity.ok(staffService.getAllSpecialties());}</span>
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;StaffResponseDTO&gt; getById(@PathVariable Long id){
+<span class="nc" id="L31">        return ResponseEntity.ok(staffService.getById(id));</span>
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;StaffResponseDTO&gt; create(@Valid @RequestBody StaffRequestDTO dto){
+<span class="nc" id="L36">        return ResponseEntity.status(HttpStatus.CREATED).body(staffService.create(dto));</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;StaffResponseDTO&gt; update(@PathVariable Long id, @Valid @RequestBody StaffRequestDTO dto){
+<span class="nc" id="L41">        return ResponseEntity.ok(staffService.update(id,dto));</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable Long id){
+<span class="nc" id="L46">        staffService.desactivate(id);</span>
+<span class="nc" id="L47">        return ResponseEntity.noContent().build();</span>
+    }
+
+    //Listar staffs por sede
+    @GetMapping(&quot;/branch/{branchId}&quot;)
+    public ResponseEntity&lt;List&lt;StaffResponseDTO&gt;&gt; findStaffByBranchId(@PathVariable Long branchId){
+<span class="nc" id="L53">        return ResponseEntity.ok(staffService.findStaffByBranchId(branchId));</span>
+    }
+
+    //Endpoint de consumo para verificar si existe el staff
+    @GetMapping(&quot;/{id}/exists&quot;)
+    public ResponseEntity&lt;Boolean&gt; staffExistsById(@PathVariable Long id){
+<span class="nc" id="L59">        return ResponseEntity.ok(staffService.staffExistsById(id));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

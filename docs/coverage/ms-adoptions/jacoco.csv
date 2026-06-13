@@ -1,0 +1,6 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+ms-adoptions,com.vitalpet.msadoptions.service,AdoptionService,20,233,1,7,0,48,5,11,4,8
+ms-adoptions,com.vitalpet.msadoptions.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+ms-adoptions,com.vitalpet.msadoptions.exception,GlobalExceptionHandler,175,0,0,0,46,0,8,0,8,0
+ms-adoptions,com.vitalpet.msadoptions,MsAdoptionsApplication,8,0,0,0,3,0,2,0,2,0
+ms-adoptions,com.vitalpet.msadoptions.controller,AdoptionController,35,0,0,0,6,0,6,0,6,0

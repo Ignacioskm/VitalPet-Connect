@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-payments</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.mspayments.service</a> &gt; <span class="el_source">PaymentService.java</span></div><h1>PaymentService.java</h1><pre class="source lang-java linenums">package com.vitalpet.mspayments.service;
+
+import com.vitalpet.mspayments.client.NotificationClient;
+import com.vitalpet.mspayments.dto.NotificationRequestDTO;
+import com.vitalpet.mspayments.dto.PaymentRequestDTO;
+import com.vitalpet.mspayments.dto.PaymentResponseDTO;
+import com.vitalpet.mspayments.exception.ResourceNotFoundException;
+import com.vitalpet.mspayments.model.Payment;
+import com.vitalpet.mspayments.model.PaymentMethod;
+import com.vitalpet.mspayments.model.PaymentStatus;
+import com.vitalpet.mspayments.repository.PaymentMethodRepository;
+import com.vitalpet.mspayments.repository.PaymentRepository;
+import com.vitalpet.mspayments.repository.PaymentStatusRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+<span class="fc" id="L21">public class PaymentService {</span>
+
+    @Autowired private PaymentRepository paymentRepository;
+    @Autowired private PaymentStatusRepository paymentStatusRepository;
+    @Autowired private PaymentMethodRepository paymentMethodRepository;
+    @Autowired private NotificationClient notificationClient;
+
+    public PaymentResponseDTO create(PaymentRequestDTO paymentRequestDTO){
+<span class="fc" id="L29">        PaymentStatus pending = paymentStatusRepository.findByName(&quot;PENDING&quot;)</span>
+<span class="fc" id="L30">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Estado PENDING no Encontrado&quot;));</span>
+
+<span class="fc" id="L32">        Payment payment = new Payment();</span>
+<span class="fc" id="L33">        payment.setAmount(paymentRequestDTO.getAmount());</span>
+<span class="fc" id="L34">        payment.setUserId(paymentRequestDTO.getUserId());</span>
+<span class="fc" id="L35">        payment.setAppointmentId(paymentRequestDTO.getAppointmentId());</span>
+<span class="fc" id="L36">        payment.setStatus(pending);</span>
+
+<span class="fc" id="L38">        return toDTO(paymentRepository.save(payment));</span>
+    }
+
+    //Lógica de pago
+    public PaymentResponseDTO pay(Long id, String methodName){
+<span class="fc" id="L43">        Payment payment  = paymentRepository.findById(id)</span>
+<span class="pc" id="L44">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Pago no encontrado&quot;));</span>
+
+<span class="fc" id="L46">        PaymentStatus paidStatus = paymentStatusRepository.findByName(&quot;PAID&quot;)</span>
+<span class="pc" id="L47">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Estado PAID no existe&quot;));</span>
+
+<span class="fc" id="L49">        PaymentMethod method = paymentMethodRepository.findByName(methodName)</span>
+<span class="fc" id="L50">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Método de pago &quot; + methodName + &quot; no existe&quot;));</span>
+
+<span class="fc" id="L52">        payment.setStatus(paidStatus);</span>
+<span class="fc" id="L53">        payment.setMethod(method);</span>
+<span class="fc" id="L54">        payment.setPaidAt(LocalDateTime.now());</span>
+
+<span class="fc" id="L56">        Payment savedPayment = paymentRepository.save(payment);</span>
+
+        //Aquí debería ir la lógica de la notificación
+<span class="fc" id="L59">        NotificationRequestDTO notificationDTO = new NotificationRequestDTO();</span>
+<span class="fc" id="L60">        notificationDTO.setUserId(savedPayment.getUserId());</span>
+<span class="fc" id="L61">        notificationDTO.setType(&quot;PAYMENT_CONFIRMED&quot;);</span>
+<span class="fc" id="L62">        notificationDTO.setMessage(&quot;Su pago de: $&quot;+savedPayment.getAmount() + &quot; en VitalPetConnect ha sido procesado de manera exitosa.&quot;);</span>
+
+        // Aca ahcemos trycatch por si notificaciones está off
+        try {
+<span class="fc" id="L66">            notificationClient.sendNotification(notificationDTO);</span>
+<span class="fc" id="L67">        } catch (Exception e) {</span>
+            // Aca no lanzamos excepción porque el pago ya está hecho
+<span class="fc" id="L69">            System.err.println(&quot;Advertencia: El pago fue guardado como PAID, pero ms-notifications no pudo enviar el correo de confirmación.&quot;);</span>
+<span class="fc" id="L70">        }</span>
+
+<span class="fc" id="L72">        return toDTO(savedPayment);</span>
+
+    }
+
+    public PaymentResponseDTO refund(Long id){
+<span class="fc" id="L77">        Payment payment  = paymentRepository.findById(id)</span>
+<span class="pc" id="L78">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Pago no encontrado&quot;));</span>
+
+<span class="fc" id="L80">        PaymentStatus refunded = paymentStatusRepository.findByName(&quot;REFUNDED&quot;)</span>
+<span class="pc" id="L81">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Estado REFUNDED no existe&quot;));</span>
+
+<span class="fc" id="L83">        payment.setStatus(refunded);</span>
+<span class="fc" id="L84">        return toDTO(paymentRepository.save(payment));</span>
+    }
+
+    //Traer todos
+    public List&lt;PaymentResponseDTO&gt; getAll(){
+<span class="fc" id="L89">        return paymentRepository.findAll().stream().map(this::toDTO).toList();</span>
+    }
+
+    //Traer payments pendientes de un usuario
+    public List&lt;PaymentResponseDTO&gt; getPendingByUser(Long id){
+<span class="fc" id="L94">        return paymentRepository.findByUserIdAndStatusName(id,&quot;PENDING&quot;).stream().map(this::toDTO).toList();</span>
+    }
+
+
+    // Payment TO DTO
+    private PaymentResponseDTO toDTO(Payment payment){
+<span class="fc" id="L100">        PaymentResponseDTO dto = new PaymentResponseDTO();</span>
+<span class="fc" id="L101">        dto.setId(payment.getId());</span>
+<span class="fc" id="L102">        dto.setAmount(payment.getAmount());</span>
+<span class="fc" id="L103">        dto.setPaidAt(payment.getPaidAt());</span>
+<span class="fc" id="L104">        dto.setCreatedAt(payment.getCreatedAt());</span>
+
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if(payment.getStatus() != null){</span>
+<span class="fc" id="L107">            dto.setStatusName(payment.getStatus().getName());</span>
+        }
+
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        if(payment.getMethod() != null){</span>
+<span class="fc" id="L111">            dto.setMethodName(payment.getMethod().getName());</span>
+        } else {
+<span class="fc" id="L113">            dto.setMethodName(null);</span>
+        }
+
+<span class="fc" id="L116">        dto.setUserId(payment.getUserId());</span>
+<span class="fc" id="L117">        dto.setAppointmentId(payment.getAppointmentId());</span>
+<span class="fc" id="L118">        return dto;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

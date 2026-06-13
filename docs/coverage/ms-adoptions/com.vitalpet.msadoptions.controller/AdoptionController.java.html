@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdoptionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-adoptions</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msadoptions.controller</a> &gt; <span class="el_source">AdoptionController.java</span></div><h1>AdoptionController.java</h1><pre class="source lang-java linenums">package com.vitalpet.msadoptions.controller;
+
+import com.vitalpet.msadoptions.dto.AdoptionRequestDTO;
+import com.vitalpet.msadoptions.dto.AdoptionResponseDTO;
+import com.vitalpet.msadoptions.dto.PetResponseDTO;
+import com.vitalpet.msadoptions.service.AdoptionService;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/adoptions&quot;)
+<span class="nc" id="L17">public class AdoptionController {</span>
+
+    @Autowired private AdoptionService adoptionService;
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;AdoptionResponseDTO&gt;&gt; getAll(){
+<span class="nc" id="L23">        return ResponseEntity.ok(adoptionService.getAll());</span>
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;AdoptionResponseDTO&gt; create(@Valid @RequestBody AdoptionRequestDTO dto){
+<span class="nc" id="L28">        return ResponseEntity.status(HttpStatus.CREATED).body(adoptionService.create(dto));</span>
+    }
+
+    // Usamos RequestParam para simular qué trabajador está haciendo la acción
+    @PutMapping(&quot;/{id}/approve&quot;)
+    public ResponseEntity&lt;AdoptionResponseDTO&gt; approve(@PathVariable Long id, @RequestParam Long staffId){
+<span class="nc" id="L34">        return ResponseEntity.ok(adoptionService.approve(id,staffId));</span>
+    }
+
+    @PutMapping(&quot;/{id}/reject&quot;)
+    public ResponseEntity&lt;AdoptionResponseDTO&gt; reject(@PathVariable Long id, @RequestParam Long staffId){
+<span class="nc" id="L39">        return ResponseEntity.ok(adoptionService.reject(id,staffId));</span>
+    }
+
+    @GetMapping(&quot;/available/pets&quot;)
+    public ResponseEntity&lt;List&lt;PetResponseDTO&gt;&gt; getAvailablePets(){
+<span class="nc" id="L44">        return ResponseEntity.ok(adoptionService.getAvailablePets());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

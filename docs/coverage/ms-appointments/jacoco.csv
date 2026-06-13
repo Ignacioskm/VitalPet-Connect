@@ -1,0 +1,6 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+ms-appointments,com.vitalpet.msappointments.controller,AppointmentController,47,0,0,0,8,0,8,0,8,0
+ms-appointments,com.vitalpet.msappointments.service,AppointmentService,41,303,2,8,0,67,8,12,6,9
+ms-appointments,com.vitalpet.msappointments.exception,GlobalExceptionHandler,202,0,0,0,53,0,9,0,9,0
+ms-appointments,com.vitalpet.msappointments.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+ms-appointments,com.vitalpet.msappointments,MsAppointmentsApplication,8,0,0,0,3,0,2,0,2,0
