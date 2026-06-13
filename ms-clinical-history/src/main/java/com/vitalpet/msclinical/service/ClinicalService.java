@@ -26,12 +26,10 @@ public class ClinicalService {
     public ClinicalRecordResponseDTO create(ClinicalRecordRequestDTO dto){
        //Validamos que pet y staff existan
        Boolean petExists = petClient.existsById(dto.getPetId());
+        if(!petExists){
+            throw new ResourceNotFoundException("Error: La mascota con ID " + dto.getPetId() + " no existe");
+        }
        Boolean staffExists = staffClient.existsById(dto.getStaffId());
-
-       if(!petExists){
-           throw new ResourceNotFoundException("Error: La mascota con ID " + dto.getPetId() + " no existe");
-       }
-
        if(!staffExists){
            throw new ResourceNotFoundException("Error: El funcionario con ID " + dto.getStaffId() + " no existe");
        }
