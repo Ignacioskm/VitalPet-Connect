@@ -19,4 +19,7 @@ public interface PetClient {
 
     @PutMapping("/api/pets/{petId}/owner/{userId}")
     Void updateOwner(@PathVariable Long petId, @PathVariable Long userId);
+
+    @GetMapping("/api/pets/{id}")
+    PetResponseDTO getPetById(@PathVariable Long id);
 }

@@ -31,7 +31,7 @@ public class SecurityConfig {
                 //STATELESS declara la sesión sin estado, significa que el servidor no recordará quien eres entre una petición y otra.
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register","/api/auth/login","/error").permitAll() //la dejamos como rutas publicas
+                        .requestMatchers("/api/auth/register","/api/auth/login","/error","/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html","/api/auth/v3/api-docs/**").permitAll() //la dejamos como rutas publicas
                         .anyRequest().authenticated() //el resto requiere toquen si o si
                 );
         return http.build();

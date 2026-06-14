@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControllerBranches.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-branch</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msbranches.controller</a> &gt; <span class="el_source">ControllerBranches.java</span></div><h1>ControllerBranches.java</h1><pre class="source lang-java linenums">package com.vitalpet.msbranches.controller;
+
+
+import com.vitalpet.msbranches.dto.BranchesRequestDTO;
+import com.vitalpet.msbranches.dto.BranchesResponseDTO;
+import com.vitalpet.msbranches.dto.CityResponseDTO;
+import com.vitalpet.msbranches.service.ServiceBranches;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/branches&quot;)
+<span class="nc" id="L18">public class ControllerBranches {</span>
+
+    @Autowired
+    private ServiceBranches serviceBranches;
+
+    @GetMapping
+<span class="nc" id="L24">    public ResponseEntity&lt;List&lt;BranchesResponseDTO&gt;&gt; getAll() {return ResponseEntity.ok(serviceBranches.getAll());}</span>
+
+    @GetMapping(&quot;/cities&quot;)
+<span class="nc" id="L27">    public ResponseEntity&lt;List&lt;CityResponseDTO&gt;&gt; getAllCities() {return ResponseEntity.ok(serviceBranches.getAllCities());}</span>
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;BranchesResponseDTO&gt; getById(@PathVariable Long id) {
+<span class="nc" id="L31">        return ResponseEntity.ok(serviceBranches.getById(id));</span>
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;BranchesResponseDTO&gt; create(@Valid @RequestBody BranchesRequestDTO dto) {
+<span class="nc" id="L36">        return ResponseEntity.status(HttpStatus.CREATED).body(serviceBranches.create(dto));</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;BranchesResponseDTO&gt; update(@PathVariable Long id, @Valid @RequestBody BranchesRequestDTO dto) {
+<span class="nc" id="L41">        return ResponseEntity.ok(serviceBranches.update(id,dto));</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable Long id) {
+<span class="nc" id="L46">        serviceBranches.deactivate(id);</span>
+<span class="nc" id="L47">        return ResponseEntity.noContent().build();</span>
+    }
+
+    @GetMapping(&quot;/{id}/exists&quot;)
+    public ResponseEntity&lt;Boolean&gt; branchExistsById(@PathVariable Long id){
+<span class="nc" id="L52">        return ResponseEntity.ok(serviceBranches.branchExistsById(id));</span>
+    }
+
+    //Listar sucursales por ciudad
+    @GetMapping(&quot;/city/{cityId}&quot;)
+    public ResponseEntity&lt;List&lt;BranchesResponseDTO&gt;&gt; branchByCity(@PathVariable Long cityId){
+<span class="nc" id="L58">        return ResponseEntity.ok(serviceBranches.findByCityId(cityId));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

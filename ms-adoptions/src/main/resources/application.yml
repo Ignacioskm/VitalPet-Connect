@@ -1,5 +1,6 @@
 server:
   port: 8088
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -11,7 +12,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -33,4 +34,4 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
   api-docs:
-    path: /v3/api-docs
+    path: /api/adoptions/v3/api-docs

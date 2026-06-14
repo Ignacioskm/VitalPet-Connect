@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-users</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.msusers.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.vitalpet.msusers.service;
+
+import com.vitalpet.msusers.dto.UserRequestDTO;
+import com.vitalpet.msusers.dto.UserResponseDTO;
+import com.vitalpet.msusers.exception.ResourceNotFoundException;
+import com.vitalpet.msusers.model.Role;
+import com.vitalpet.msusers.model.User;
+import com.vitalpet.msusers.repository.RoleRepository;
+import com.vitalpet.msusers.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L17">public class UserService {</span>
+    @Autowired private UserRepository userRepository;
+    @Autowired private RoleRepository roleRepository;
+
+
+    /*Explicación código:
+    findBy busca a todos los users activos, luego pasamos la lista a un flujo de datos con stream como si fuese una cinta transportadora
+    luego a cada dato de esa cinta le hacemos un map con el metodo toDTO que transforma un user a dto y retorna dto
+    y con .collect volvemos a agrupar esos datos que se mapearon uno a uno una lista pero ahora de UserResponseDTO
+     */
+    public List&lt;UserResponseDTO&gt; getAll(){
+<span class="fc" id="L28">        return userRepository.findByActiveTrue().stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+
+    //Aca importante acordarse que findById devuelve un Optional! (Leer notas Notion)
+    public UserResponseDTO getById(Long id){
+<span class="fc" id="L34">        User user = userRepository.findById(id).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+<span class="fc" id="L35">        return toDTO(user);</span>
+    }
+
+
+    //Crear usuario DTO **Recordar que el requestDTO es lo que el cliente envía.
+    public UserResponseDTO create(UserRequestDTO dto){
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if(userRepository.existsByEmail(dto.getEmail())){</span>
+<span class="fc" id="L42">            throw new IllegalArgumentException(&quot;El email ya está registrado&quot;);</span>
+        }
+
+        //Buscamos rol por el nombre
+<span class="fc" id="L46">        Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Rol no encontrado&quot; + dto.getRoleName()));</span>
+
+<span class="fc" id="L48">        User user = new User();</span>
+<span class="fc" id="L49">        user.setFirstName(dto.getFirstName());</span>
+<span class="fc" id="L50">        user.setLastName(dto.getLastName());</span>
+<span class="fc" id="L51">        user.setEmail(dto.getEmail());</span>
+<span class="fc" id="L52">        user.setPhoneNumber(dto.getPhoneNumber());</span>
+<span class="fc" id="L53">        user.setAddress(dto.getAddress());</span>
+<span class="fc" id="L54">        user.setRole(role);</span>
+
+<span class="fc" id="L56">        return toDTO(userRepository.save(user));</span>
+    }
+
+    //Update usuario DTO
+    public UserResponseDTO update(Long id, UserRequestDTO dto){
+<span class="pc" id="L61">        User existing = userRepository.findById(id).orElseThrow(()-&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+
+<span class="pc" id="L63">        Role role = roleRepository.findByName(dto.getRoleName()).orElseThrow(()-&gt; new ResourceNotFoundException(&quot;Rol no encontrado&quot; + dto.getRoleName()));</span>
+
+
+<span class="fc" id="L66">        existing.setFirstName(dto.getFirstName());</span>
+<span class="fc" id="L67">        existing.setLastName(dto.getLastName());</span>
+<span class="fc" id="L68">        existing.setPhoneNumber(dto.getPhoneNumber());</span>
+<span class="fc" id="L69">        existing.setAddress(dto.getAddress());</span>
+<span class="fc" id="L70">        existing.setRole(role);</span>
+        //Considerando que en la lógica buscamos todos por email, no lo dejamos actualizar para evitar duplicados.
+
+<span class="fc" id="L73">        return toDTO(userRepository.save(existing));</span>
+    }
+
+    //DESACTIVAMOS un usuario.
+    public void deactivate(Long id){
+<span class="pc" id="L78">        User user = userRepository.findById(id).orElseThrow(()-&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+
+<span class="fc" id="L80">        user.setActive(false);</span>
+<span class="fc" id="L81">        userRepository.save(user);</span>
+<span class="fc" id="L82">    }</span>
+
+    //Verificar si existe
+    public boolean UserExistsById(Long id){
+<span class="fc" id="L86">        return userRepository.existsById(id);</span>
+    }
+
+
+    //Traer usuarios por rol
+    public List&lt;UserResponseDTO&gt; getUsersByRol(String roleName){
+<span class="fc" id="L92">        return userRepository.findByRoleName(roleName).stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+    //Verificar si el user es Cliente
+    public Boolean isClient(Long id){
+<span class="fc" id="L97">        User user = userRepository.findById(id)</span>
+<span class="pc" id="L98">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+<span class="fc" id="L99">        return user.getRole().getName().equalsIgnoreCase(&quot;CLIENT&quot;);</span>
+    }
+
+    //Verificar si es VET
+    public Boolean isVet(Long id){
+<span class="fc" id="L104">        User user = userRepository.findById(id)</span>
+<span class="pc" id="L105">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario no encontrado&quot;));</span>
+<span class="fc" id="L106">        return user.getRole().getName().equalsIgnoreCase(&quot;VET&quot;);</span>
+    }
+
+    //Metodo que se usará para obtener el email en el ms-notifications
+    public String getEmailById(Long id) {
+<span class="fc" id="L111">        return userRepository.findEmailById(id).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Usuario con ID &quot; + id + &quot; no encontrado o no tiene email&quot;));</span>
+    }
+
+    //Convertir User -&gt; UserResponseDTO
+    private UserResponseDTO toDTO(User user){
+<span class="fc" id="L116">        UserResponseDTO dto = new UserResponseDTO();</span>
+<span class="fc" id="L117">        dto.setId(user.getId());</span>
+<span class="fc" id="L118">        dto.setFirstName(user.getFirstName());</span>
+<span class="fc" id="L119">        dto.setLastName(user.getLastName());</span>
+<span class="fc" id="L120">        dto.setEmail(user.getEmail());</span>
+<span class="fc" id="L121">        dto.setPhoneNumber(user.getPhoneNumber());</span>
+<span class="fc" id="L122">        dto.setAddress(user.getAddress());</span>
+<span class="fc" id="L123">        dto.setActive(user.getActive());</span>
+<span class="fc" id="L124">        dto.setCreatedAt(user.getCreatedAt());</span>
+<span class="fc" id="L125">        dto.setRoleName(user.getRole().getName());</span>
+<span class="fc" id="L126">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

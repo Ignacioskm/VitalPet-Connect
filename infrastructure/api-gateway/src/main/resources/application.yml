@@ -15,7 +15,7 @@ spring:
         - id: ms-users
           uri: lb://ms-users
           predicates:
-            - Path=/api/users/**
+            - Path=/api/user/**
 
         - id: ms-pets
           uri: lb://ms-pets
@@ -56,6 +56,37 @@ spring:
           uri: lb://ms-branches
           predicates:
             - Path=/api/branches/**
+    globalcors:
+      cors-configurations:
+        '[/**]':
+          allowed-origins: "*"
+          allowed-headers: "*"
+          allowed-methods: "*"
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: "01. Auth"
+        url: /api/auth/v3/api-docs
+      - name: "02. Users"
+        url: /api/user/v3/api-docs
+      - name: "03. Pets"
+        url: /api/pets/v3/api-docs
+      - name: "04. Clinical History"
+        url: /api/clinical/v3/api-docs
+      - name: "05. Appointments"
+        url: /api/appointments/v3/api-docs
+      - name: "06. Staff"
+        url: /api/staff/v3/api-docs
+      - name: "07. Payments"
+        url: /api/payments/v3/api-docs
+      - name: "08. Adoptions"
+        url: /api/adoptions/v3/api-docs
+      - name: "09. Notifications"
+        url: /api/notifications/v3/api-docs
+      - name: "10. Branches"
+        url: /api/branches/v3/api-docs
 
 eureka:
   client:

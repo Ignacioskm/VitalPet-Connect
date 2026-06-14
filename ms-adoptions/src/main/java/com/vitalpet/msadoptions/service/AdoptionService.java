@@ -27,12 +27,30 @@ public class AdoptionService {
 
     public AdoptionResponseDTO create(AdoptionRequestDTO dto) {
 
-        //Validar si existe pet y user
-        if (!petClient.existById(dto.getPetId())) throw new ResourceNotFoundException("La mascota no existe.");
-        if (!userClient.existById(dto.getUserId())) throw new ResourceNotFoundException("El usuario no existe.");
+        //Validamos que la mascota exista y esté disponible pa adoptar
+        PetResponseDTO pet;
+        try {
+            pet = petClient.getPetById(dto.getPetId());
+        } catch (Exception e){
+            throw new ResourceNotFoundException("La mascota con ID "+ dto.getPetId());
+        }
+
+        if(pet.getOwnerId() != null){
+            throw new IllegalArgumentException("Error: La mascota " + pet.getName() + " ya tiene un dueño asignado");
+        }
+
+        //Validamos usuario y rol , que exista y que sea client
+        if (!userClient.existById(dto.getUserId())) {
+            throw new ResourceNotFoundException("El usuario con ID " + dto.getUserId() + " no existe.");
+        }
+
+        if (Boolean.FALSE.equals(userClient.isClient(dto.getUserId()))) {
+            throw new IllegalArgumentException("Error: Solo los usuarios registrados como CLIENT pueden realizar solicitudes de adopción.");
+        }
 
         //Se asigna estado pending
-        AdoptionStatus adoptionStatus = adoptionStatusRepository.findByName("PENDING").orElseThrow(() -> new ResourceNotFoundException("Estado PENDING no encontrado."));
+        AdoptionStatus adoptionStatus = adoptionStatusRepository.findByName("PENDING")
+                .orElseThrow(() -> new ResourceNotFoundException("Estado PENDING no encontrado."));
 
         Adoption adoption = new Adoption();
         adoption.setNotes(dto.getNotes());

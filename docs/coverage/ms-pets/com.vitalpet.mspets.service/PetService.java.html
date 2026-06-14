@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PetService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ms-pets</a> &gt; <a href="index.source.html" class="el_package">com.vitalpet.mspets.service</a> &gt; <span class="el_source">PetService.java</span></div><h1>PetService.java</h1><pre class="source lang-java linenums">package com.vitalpet.mspets.service;
+
+import com.vitalpet.mspets.dto.PetRequestDTO;
+import com.vitalpet.mspets.dto.PetResponseDTO;
+import com.vitalpet.mspets.dto.SpeciesResponseDTO;
+import com.vitalpet.mspets.exception.ResourceNotFoundException;
+import com.vitalpet.mspets.model.Pet;
+import com.vitalpet.mspets.model.Species;
+import com.vitalpet.mspets.client.UserClient;
+import com.vitalpet.mspets.repository.PetRepository;
+import com.vitalpet.mspets.repository.SpeciesRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+<span class="fc" id="L19">public class PetService {</span>
+
+    @Autowired private PetRepository petRepository;
+
+    @Autowired private SpeciesRepository speciesRepository;
+
+    @Autowired private UserClient userClient;
+
+    public List&lt;PetResponseDTO&gt; getAvailablePets() {
+<span class="fc" id="L28">        return petRepository.findByOwnerIdIsNull().stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+    public List&lt;SpeciesResponseDTO&gt; getAllSpecies(){
+<span class="fc" id="L32">        return speciesRepository.findAll().stream().map(this::toSpDTO).toList();</span>
+    }
+
+    public List&lt;PetResponseDTO&gt; getAll() {
+<span class="fc" id="L36">        return petRepository.findByActiveTrue().stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+    public PetResponseDTO getById(Long id) {
+<span class="fc" id="L40">        Pet pet = petRepository.findById(id).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Mascota no encontrada.&quot;));</span>
+<span class="fc" id="L41">        return toDTO(pet);</span>
+    }
+
+    public PetResponseDTO create(PetRequestDTO dto) {
+<span class="fc" id="L45">        Species species = speciesRepository.findById(dto.getSpeciesId())</span>
+<span class="fc" id="L46">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Error: La especie con ID &quot; + dto.getSpeciesId() + &quot; no existe.&quot;));</span>
+
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if(dto.getOwnerId() != null){</span>
+<span class="fc" id="L49">            Boolean userExist = userClient.existById(dto.getOwnerId());</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">            if (Boolean.FALSE.equals(userExist)) {</span>
+<span class="nc" id="L51">                throw new ResourceNotFoundException(&quot;Error: El dueño con ID &quot; + dto.getOwnerId() + &quot; no existe.&quot;);</span>
+            }
+
+<span class="fc" id="L54">            Boolean isClient = userClient.isClient(dto.getOwnerId());</span>
+
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            if (Boolean.FALSE.equals(isClient)){</span>
+<span class="fc" id="L57">                throw new IllegalArgumentException(&quot;Error: El user no es un cliente.&quot;);</span>
+            }
+        }
+
+
+<span class="fc" id="L62">        Pet pet = new Pet();</span>
+<span class="fc" id="L63">        pet.setName(dto.getName());</span>
+<span class="fc" id="L64">        pet.setBreed(dto.getBreed());</span>
+<span class="fc" id="L65">        pet.setBirthDate(dto.getBirthDate());</span>
+<span class="fc" id="L66">        pet.setWeight(dto.getWeight());</span>
+<span class="fc" id="L67">        pet.setActive(true);</span>
+<span class="fc" id="L68">        pet.setOwnerId(dto.getOwnerId());</span>
+<span class="fc" id="L69">        pet.setSpecies(species);</span>
+
+<span class="fc" id="L71">        return toDTO(petRepository.save(pet));</span>
+    }
+
+    public PetResponseDTO update(Long id, PetRequestDTO dto) {
+<span class="fc" id="L75">        Pet existing = petRepository.findById(id)</span>
+<span class="pc" id="L76">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Error: La mascota con ID &quot; + id + &quot; no existe.&quot;));</span>
+
+<span class="fc" id="L78">        Species species = speciesRepository.findById(dto.getSpeciesId())</span>
+<span class="pc" id="L79">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Error: La especie con ID &quot; + dto.getSpeciesId() + &quot; no existe.&quot;));</span>
+
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if(dto.getOwnerId() != null){</span>
+<span class="fc" id="L82">            Boolean userExist = userClient.existById(dto.getOwnerId());</span>
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            if (Boolean.FALSE.equals(userExist)) {</span>
+<span class="fc" id="L85">                throw new ResourceNotFoundException(&quot;Error: El dueño con ID &quot; + dto.getOwnerId() + &quot; no existe.&quot;);</span>
+            }
+<span class="fc" id="L87">            Boolean isClient = userClient.isClient(dto.getOwnerId());</span>
+
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">            if (Boolean.FALSE.equals(isClient)){</span>
+<span class="nc" id="L90">                throw new IllegalArgumentException(&quot;Error: El user no es un cliente.&quot;);</span>
+            }
+        }
+
+<span class="fc" id="L94">        existing.setName(dto.getName());</span>
+<span class="fc" id="L95">        existing.setBreed(dto.getBreed());</span>
+<span class="fc" id="L96">        existing.setBirthDate(dto.getBirthDate());</span>
+<span class="fc" id="L97">        existing.setWeight(dto.getWeight());</span>
+<span class="fc" id="L98">        existing.setSpecies(species);</span>
+<span class="fc" id="L99">        existing.setOwnerId(dto.getOwnerId());</span>
+
+<span class="fc" id="L101">        return toDTO(petRepository.save(existing));</span>
+    }
+
+    public void deactivate(Long id) {
+<span class="pc" id="L105">        Pet pet = petRepository.findById(id).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Mascota no encontrada.&quot;));</span>
+
+<span class="fc" id="L107">        pet.setActive(false);</span>
+<span class="fc" id="L108">        petRepository.save(pet);</span>
+<span class="fc" id="L109">    }</span>
+
+    //Traer lista de mascotas de cada dueño
+    public  List&lt;PetResponseDTO&gt; getByOwnerId(Long ownerId) {
+<span class="fc" id="L113">        return petRepository.findByOwnerId(ownerId).stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+
+    public List&lt;PetResponseDTO&gt; getBySpeciesName(String speciesName) {
+<span class="fc" id="L118">        return petRepository.findBySpeciesName(speciesName).stream().map(this::toDTO).collect(Collectors.toList());</span>
+    }
+
+    //Validar si el pet existe
+    public boolean petExists(Long id){
+<span class="fc" id="L123">        return petRepository.existsPetById(id);</span>
+    }
+
+    public void assignOwner(Long petId,Long userId){
+<span class="pc" id="L127">        Pet pet = petRepository.findById(petId).orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Mascota no encontrada.&quot;));</span>
+
+<span class="fc" id="L129">        Boolean userExist = userClient.existById(userId);</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">        if(Boolean.FALSE.equals(userExist)){</span>
+<span class="nc" id="L131">            throw new ResourceNotFoundException(&quot;Usuario no encontrado&quot;);</span>
+        }
+
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (Boolean.FALSE.equals(userClient.isClient(userId))) {</span>
+<span class="fc" id="L135">            throw new IllegalArgumentException(&quot;El usuario debe tener el rol de cliente para ser dueño de una mascota.&quot;);</span>
+        }
+
+<span class="fc" id="L138">        pet.setOwnerId(userId);</span>
+<span class="fc" id="L139">        petRepository.save(pet);</span>
+<span class="fc" id="L140">    }</span>
+
+    private PetResponseDTO toDTO(Pet pet) {
+<span class="fc" id="L143">        PetResponseDTO dto = new PetResponseDTO();</span>
+<span class="fc" id="L144">        dto.setId(pet.getId());</span>
+<span class="fc" id="L145">        dto.setName(pet.getName());</span>
+<span class="fc" id="L146">        dto.setBreed(pet.getBreed());</span>
+<span class="fc" id="L147">        dto.setBirthDate(pet.getBirthDate());</span>
+<span class="fc" id="L148">        dto.setWeight(pet.getWeight());</span>
+<span class="fc" id="L149">        dto.setActive(pet.getActive());</span>
+<span class="fc" id="L150">        dto.setCreatedAt(pet.getCreatedAt());</span>
+<span class="fc" id="L151">        dto.setSpeciesId(pet.getSpecies().getId());</span>
+<span class="fc" id="L152">        dto.setOwnerId(pet.getOwnerId());</span>
+<span class="fc" id="L153">        return dto;</span>
+    }
+
+    private SpeciesResponseDTO toSpDTO(Species species){
+<span class="fc" id="L157">        SpeciesResponseDTO dto = new SpeciesResponseDTO();</span>
+<span class="fc" id="L158">        dto.setId(species.getId());</span>
+<span class="fc" id="L159">        dto.setName(species.getName());</span>
+<span class="fc" id="L160">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

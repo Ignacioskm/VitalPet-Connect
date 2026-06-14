@@ -13,5 +13,4 @@ public interface UserClient {
 
     @GetMapping("/api/user/{id}/is-client")
     Boolean isClient(@PathVariable Long id);
-
 }

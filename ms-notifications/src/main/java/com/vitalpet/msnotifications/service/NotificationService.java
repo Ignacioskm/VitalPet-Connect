@@ -20,17 +20,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class NotificationService {
 
-    @Autowired
-    private NotificationRepository notificationRepository;
-
-    @Autowired
-    private NotificationTypeRepository notificationTypeRepository;
-
-    @Autowired
-    private UserClient userClient;
+    @Autowired private NotificationRepository notificationRepository;
+    @Autowired private NotificationTypeRepository notificationTypeRepository;
+    @Autowired private UserClient userClient;
 
     public NotificationResponseDTO createNotification(NotificationRequestDTO request) {
-        String email = userClient.getEmailById(request.getUserId());
+
+        String email;
+        try {
+            email = userClient.getEmailById(request.getUserId());
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error de comunicación: El usuario con ID " + request.getUserId() + " no fue encontrado en ms-users.");
+        }
 
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("El usuario con ID " + request.getUserId() + " no tiene un email válido.");

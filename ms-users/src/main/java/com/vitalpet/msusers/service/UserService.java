@@ -15,26 +15,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private RoleRepository roleRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
-
-    //Convertir User -> UserResponseDTO
-    private UserResponseDTO toDTO(User user){
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setId(user.getId());
-        dto.setFirstName(user.getFirstName());
-        dto.setLastName(user.getLastName());
-        dto.setEmail(user.getEmail());
-        dto.setPhoneNumber(user.getPhoneNumber());
-        dto.setAddress(user.getAddress());
-        dto.setActive(user.getActive());
-        dto.setCreatedAt(user.getCreatedAt());
-        dto.setRoleName(user.getRole().getName());
-        return dto;
-    }
 
     /*Explicación código:
     findBy busca a todos los users activos, luego pasamos la lista a un flujo de datos con stream como si fuese una cinta transportadora
@@ -111,12 +94,35 @@ public class UserService {
 
     //Verificar si el user es Cliente
     public Boolean isClient(Long id){
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return user.getRole().getName().equalsIgnoreCase("CLIENT");
+    }
+
+    //Verificar si es VET
+    public Boolean isVet(Long id){
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        return user.getRole().getName().equalsIgnoreCase("VET");
     }
 
     //Metodo que se usará para obtener el email en el ms-notifications
     public String getEmailById(Long id) {
         return userRepository.findEmailById(id).orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + id + " no encontrado o no tiene email"));
+    }
+
+    //Convertir User -> UserResponseDTO
+    private UserResponseDTO toDTO(User user){
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setAddress(user.getAddress());
+        dto.setActive(user.getActive());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setRoleName(user.getRole().getName());
+        return dto;
     }
 }

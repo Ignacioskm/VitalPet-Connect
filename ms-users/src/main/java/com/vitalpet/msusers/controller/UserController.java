@@ -1,5 +1,6 @@
 package com.vitalpet.msusers.controller;
 
+import com.vitalpet.msusers.assembler.UserModelAssembler;
 import com.vitalpet.msusers.dto.UserRequestDTO;
 import com.vitalpet.msusers.dto.UserResponseDTO;
 import com.vitalpet.msusers.model.User;
@@ -7,6 +8,8 @@ import com.vitalpet.msusers.service.UserService;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,29 +20,31 @@ import java.util.List;
 @RequestMapping("/api/user")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-
-    //Como primera etapa no agregare las respuestas negativas.
+    @Autowired private UserService userService;
+    @Autowired private UserModelAssembler userAssembler;
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAll(){
-        return ResponseEntity.ok(userService.getAll());
+    public ResponseEntity<CollectionModel<EntityModel<UserResponseDTO>>> getAll(){
+        List<UserResponseDTO> users = userService.getAll();
+        return ResponseEntity.ok(userAssembler.toCollectionModel(users));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> getById(@PathVariable Long id){
-        return ResponseEntity.ok(userService.getById(id));
+    public ResponseEntity<EntityModel<UserResponseDTO>> getById(@PathVariable Long id){
+        UserResponseDTO userDTO = userService.getById(id);
+        return ResponseEntity.ok(userAssembler.toModel(userDTO));
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO dto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
+    public ResponseEntity<EntityModel<UserResponseDTO>> create(@Valid @RequestBody UserRequestDTO dto){
+        UserResponseDTO createdUser = userService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userAssembler.toModel(createdUser));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UserRequestDTO dto){
-        return ResponseEntity.ok(userService.update(id,dto));
+    public ResponseEntity<EntityModel<UserResponseDTO>> update(@PathVariable Long id, @Valid @RequestBody UserRequestDTO dto){
+        UserResponseDTO updateUser = userService.update(id,dto);
+        return ResponseEntity.ok(userAssembler.toModel(updateUser));
     }
 
     @DeleteMapping("/{id}")
@@ -50,8 +55,9 @@ public class UserController {
 
     //listar usuarios por rol
     @GetMapping("/role/{roleName}")
-    public ResponseEntity<List<UserResponseDTO>> getUsersByRol(@PathVariable String roleName){
-        return ResponseEntity.ok(userService.getUsersByRol(roleName));
+    public ResponseEntity<CollectionModel<EntityModel<UserResponseDTO>>> getUsersByRol(@PathVariable String roleName){
+        List<UserResponseDTO> users = userService.getUsersByRol(roleName);
+        return ResponseEntity.ok(userAssembler.toCollectionModel(users));
     }
 
     //Verificar si el usuario existe (Este endpoint sera consumido por otros MS)
@@ -64,6 +70,11 @@ public class UserController {
     @GetMapping("/{id}/is-client")
     public ResponseEntity<Boolean> isClient(@PathVariable Long id){
         return ResponseEntity.ok(userService.isClient(id));
+    }
+
+    @GetMapping("/{id}/is-vet")
+    public ResponseEntity<Boolean> isVet(@PathVariable Long id){
+        return ResponseEntity.ok(userService.isVet(id));
     }
 
     //Endpoint para obtener SOLO el email (ms-notifications)
