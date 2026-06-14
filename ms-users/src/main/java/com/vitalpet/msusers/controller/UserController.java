@@ -8,6 +8,7 @@ import com.vitalpet.msusers.service.UserService;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,9 @@ public class UserController {
     @Autowired private UserModelAssembler userAssembler;
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAll(){
-        return ResponseEntity.ok(userService.getAll());
+    public ResponseEntity<CollectionModel<EntityModel<UserResponseDTO>>> getAll(){
+        List<UserResponseDTO> users = userService.getAll();
+        return ResponseEntity.ok(userAssembler.toCollectionModel(users));
     }
 
     @GetMapping("/{id}")
@@ -34,13 +36,15 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO dto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
+    public ResponseEntity<EntityModel<UserResponseDTO>> create(@Valid @RequestBody UserRequestDTO dto){
+        UserResponseDTO createdUser = userService.create(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userAssembler.toModel(createdUser));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UserRequestDTO dto){
-        return ResponseEntity.ok(userService.update(id,dto));
+    public ResponseEntity<EntityModel<UserResponseDTO>> update(@PathVariable Long id, @Valid @RequestBody UserRequestDTO dto){
+        UserResponseDTO updateUser = userService.update(id,dto);
+        return ResponseEntity.ok(userAssembler.toModel(updateUser));
     }
 
     @DeleteMapping("/{id}")
@@ -51,8 +55,9 @@ public class UserController {
 
     //listar usuarios por rol
     @GetMapping("/role/{roleName}")
-    public ResponseEntity<List<UserResponseDTO>> getUsersByRol(@PathVariable String roleName){
-        return ResponseEntity.ok(userService.getUsersByRol(roleName));
+    public ResponseEntity<CollectionModel<EntityModel<UserResponseDTO>>> getUsersByRol(@PathVariable String roleName){
+        List<UserResponseDTO> users = userService.getUsersByRol(roleName);
+        return ResponseEntity.ok(userAssembler.toCollectionModel(users));
     }
 
     //Verificar si el usuario existe (Este endpoint sera consumido por otros MS)
