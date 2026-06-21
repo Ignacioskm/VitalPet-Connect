@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS vitalpet_auth;
+CREATE DATABASE IF NOT EXISTS vitalpet_users;
+CREATE DATABASE IF NOT EXISTS vitalpet_pets;
+CREATE DATABASE IF NOT EXISTS vitalpet_clinical;
+CREATE DATABASE IF NOT EXISTS vitalpet_appointments;
+CREATE DATABASE IF NOT EXISTS vitalpet_staff;
+CREATE DATABASE IF NOT EXISTS vitalpet_payments;
+CREATE DATABASE IF NOT EXISTS vitalpet_adoptions;
+CREATE DATABASE IF NOT EXISTS vitalpet_notifications;
+CREATE DATABASE IF NOT EXISTS vitalpet_branches;
